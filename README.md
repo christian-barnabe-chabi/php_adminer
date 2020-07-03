@@ -1,6 +1,6 @@
 > # PHP ADMINER, Your API, Your rules
 
-### What is "PHP API ADMIN +"
+### About "PHP ADMINER"
 
 "PHP ADMINER" is an admin panel generator fully made in PHP. It generate the views based on the responses sent by your api. That means, "PHP ADMINER" is not a part of you api. So create your API using any language or framework, and scaffold your CRUD view in no time.
 
@@ -117,9 +117,9 @@ ResourceScaffold::define('Users', 'user', 'chevron right');
 
 #### Complete the blueprint class
 
-Once the blueprint created, complete the `$url_set` class attribute where it must be specified the endpoints for listing, showing single element, deleting, creating/saving and updating. To specified that `PHP API ADMIN +` must add the concerned `id`, just make it know by adding `{id}` at the place.
+Once the blueprint created, complete the `$url_set` class attribute where it must be specified the endpoints for listing, showing single element, deleting, creating/saving and updating. To specified that `PHP ADMINER` must add the concerned `id`, just make it know by adding `{id}` at the place.
 
-As the `base_url` is set in the `env` file, `PHP API ADMIN +` will append each endpoint to it.
+As the `base_url` is set in the `env` file, `PHP ADMINER` will append each endpoint to it.
 
 ```php
 protected $url_set = [
@@ -224,9 +224,9 @@ For any action, write the rules in the `handle` method. Use the `$request` stati
 
 Resources are single page loaded dynamically blueprinting an API resource or managing a simple custom handled resource.
 
-You do not need to load the page manually or specify which resource class to load. `PHP API ADMIN +` uses class reflection to determine which class to load, and pass the request data to the resource, which are accessible in the `handle` method of the concerned loaded class. In the case `PHP API ADMIN +` can't find the class, an error 404 will show up.
+You do not need to load the page manually or specify which resource class to load. `PHP ADMINER` uses class reflection to determine which class to load, and pass the request data to the resource, which are accessible in the `handle` method of the concerned loaded class. In the case `PHP ADMINER` can't find the class, a 404 error  will show up.
 
-To load resources, `PHP API ADMIN +` will lookup in the `app/resources` folder and will base on the first passed parameter. The second parameter (`Array`) can be used to pass data to the concerned data.
+To load resources, `PHP ADMINER` will look up in the `app/resources` folder and will base on the first passed parameter. The second parameter (`Array`) can be used to pass data to the concerned data.
 
 ```php
 Resource::load('user'); // will look for App\Resource\User class
@@ -303,7 +303,7 @@ Once the API respond with data, `Auth` will look for `token` key in the response
 
 ### Authenticateable
 
-`PHP API ADMIN +` uses the `Authenticateable` class to determiner if it might authenticate the user or not before pursuing. Of course, you do not need to change anything, else in `.env.json` file by setting the `must_auth` `true` or `false`.
+`PHP ADMINER` uses the `Authenticateable` class to determiner if it might authenticate the user or not before pursuing. Of course, you do not need to change anything, else in `.env.json` file by setting the `must_auth` `true` or `false`.
 
 ### API
 
