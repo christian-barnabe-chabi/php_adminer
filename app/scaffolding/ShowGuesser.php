@@ -476,11 +476,11 @@ class ShowGuesser {
 
         $cell_value = DateFormater::format(app('date_format'), $cell_value);
 
-        $re1 = '/(http(s)?:\/\/.*)/i';
-        $re2 = '/(\w+((\.)?(\w)+)*@\w+(.\w{2,3}){1,})/i';
+        $re1 = '/(http(s)?:\/\/)(www.)?((\w|-|_)+\.\w{2,5}(\/(\w|\?|\=|-|_)*)*)/i';
+        $re2 = '/(\w+((\.|-|_)?(\w)+)*@(\w+|-|_|\.)+\.\w{2,5})/i';
         if(preg_match($re1, $cell_value) || preg_match($re2, $cell_value)) {
-            $cell_value = preg_replace($re1, "<a href='$1' target='_blank'>". Translation::translate('internet_link') ."</a>", $cell_value);
-            $cell_value = preg_replace($re2, "<a href='mailto:$1' target='_blank'>$1</a>", $cell_value);
+            $cell_value = preg_replace($re1, "<a href='$0' target='_blank'>$0</a>", $cell_value);
+            $cell_value = preg_replace($re2, "<a href='mailto:$0' target='_blank'>$0</a>", $cell_value);
             $cell_link = '';
 
             $elements .=
