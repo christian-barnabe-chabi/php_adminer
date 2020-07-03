@@ -1,0 +1,131 @@
+/* body {
+    min-width: 800px !important;
+    overflow-x: auto;
+} */
+
+@font-face {
+    font-family: 'montserrat-light';
+    src : url('/assets/fonts/Montserrat-Light.ttf');
+}
+
+@font-face {
+    font-family: 'montserrat-medium';
+    src : url('/assets/fonts/Montserrat-Medium.ttf');
+}
+
+@font-face {
+    font-family: 'montserrat';
+    src : url('/assets/fonts/Montserrat-Regular.ttf');
+}
+
+html, body {
+    height: 100%;
+    min-width: 1126px !important;
+    background-color: #edf2f8;
+    /* background-color: #eaf0f7; */
+}
+
+.ui.segment.blueprint-show {
+    font-size: 1em !important;
+    padding-left: 4px !important;
+    padding-right: 4px !important;
+}
+
+* {
+    /* box-shadow: 0px 0px 0px  !important; */
+}
+
+:not(.icon) {
+    font-family: 'montserrat' !important;
+}
+
+#mainContainer {
+    position: relative;
+}
+
+#container-sidebar{
+    overflow-y: scroll !important;
+}
+
+#side-menu, #main-container {
+    display: none;
+}
+
+th {
+    cursor: pointer !important;
+}
+
+/* sort arrow disable */
+th.sorted.ascending:after {
+	content: "  \2191";
+}
+
+/* sort arrow disable */
+th.sorted.descending:after {
+	content: " \2193";
+}
+
+/* input,
+select,
+.dropdown:not(.circular),
+.button:not(.circular),
+.menu.transition,
+.ui.card:not(.circular), .ui.card *> img,
+[data-tooltip]:hover:after,
+.ui.ribbon.label:not(.circular),
+.menu *> .item, .segment:not(.circular),
+.ui.floating.dropdown>.menu,
+.table, .label,
+.message {
+    border-radius: 0px !important;
+} */
+
+/* tbody {
+    transition: all 0.5s ease;
+} */
+
+pre, code {
+    line-break: anywhere !important;
+    word-break: break-all !important;
+    white-space: pre-line !important;
+    white-space: pre-wrap !important;
+    white-space: -moz-pre-wrap !important;
+    white-space: -pre-wrap !important;
+    white-space: -o-pre-wrap !important;
+    word-wrap: break-word !important;;
+}
+
+
+
+/* #show_tables td { */
+    /* white-space: break-spaces !important; */
+/* } */
+
+/* table td {
+    line-break: anywhere !important;
+    word-break: break-all !important;
+    white-space: pre-line !important;
+    white-space: pre-wrap !important;
+    white-space: -moz-pre-wrap !important;
+    white-space: -pre-wrap !important;
+    white-space: -o-pre-wrap !important;
+    word-wrap: break-word !important;;
+} */
+
+::-webkit-scrollbar {
+    background-color: transparent !important;
+    width: 8px !important;
+}
+
+::-webkit-scrollbar-track-piece {
+    background-color: transparent;
+}
+
+::-webkit-scrollbar-track {
+    background-color: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: rgba(128, 128, 128, 0.5) !important;
+    border-radius: 0px !important;
+}

@@ -1,0 +1,338 @@
+{
+    "create": {
+        "fr": "Nouveau",
+        "en": "Create"
+    },
+    "delete": {
+        "fr": "Supprimer",
+        "en": "Remove"
+    },
+    "show": {
+        "fr": "Afficher",
+        "en": "Show"
+    },
+    "edit": {
+        "fr": "Modifier",
+        "en": "Edit"
+    },
+    "export": {
+        "fr": "Exporter",
+        "en": "Export"
+    },
+    "save": {
+        "fr": "Sauvegarder",
+        "en": "Save"
+    },
+    "update": {
+        "fr": "Mettre à jour",
+        "en": "Update"
+    },
+    "back": {
+        "fr": "Retour",
+        "en": "back"
+    },
+    "logout": {
+        "fr": "Déconnexion",
+        "en": "Log out"
+    },
+    "login": {
+        "fr": "Connexion",
+        "en": "Log in"
+    },
+    "email": {
+        "fr": "Email",
+        "en": "Email"
+    },
+    "password": {
+        "fr": "Mot de passe",
+        "en": "Password"
+    },
+    "click_to_preview": {
+        "fr": "Cliquer pour aperçu",
+        "en": "Click to preview"
+    },
+    "list_of": {
+        "fr": "Liste",
+        "en": "List"
+    },
+    "multiple_delete": {
+        "fr": "Suppression multiple",
+        "en": "Multiple delete"
+    },
+    "login_error": {
+        "fr": "Erreur: Identifiant ou mot de passe incorrect",
+        "en": "Error: Incorrect username or password "
+    },
+    "resource_not_found": {
+        "fr": "La classe de ressource introuvable pour",
+        "en": "No resource class found for"
+    },
+    "error": {
+        "fr": "Erreur",
+        "en": "Error"
+    },
+    "failure": {
+        "fr": "Échec",
+        "en": "Failed"
+    },
+    "success": {
+        "fr": "Succès",
+        "en": "Success"
+    },
+    "operation_done": {
+        "fr": "Opération achevée avec succès",
+        "en": "Operation done successfuly"
+    },
+    "the_class": {
+        "fr": "La classe",
+        "en": "The class"
+    },
+    "must_implement_method": {
+        "fr": "doit implementer la méthode",
+        "en": "must implement the method"
+    },
+    "must_implement_function": {
+        "fr": "doit implementer la function",
+        "en": "must implement the function"
+    },
+    "php_version_error": {
+        "fr": "Version de PHP non supportée",
+        "en": "PHP Version not supported"
+    },
+    "php_version_error_desc": {
+        "fr": "PHP API ADMINER requiert une version de PHP >= 6.x. Votre server tourne sous PHP",
+        "en": "PHP API ADMINER recquires PHP 6.x. Your server is runing PHP"
+    },
+    "page_not_found": {
+        "fr": "Page introuvable",
+        "en": "Not Found"
+    },
+    "permission_error": {
+        "fr": "Vous n'avez les droits pour cette action",
+        "en": "You do not have recquired permissions for this action"
+    },
+    "denied": {
+        "fr": "Niveau de permission insuffisant",
+        "en": "Permission Error"
+    },
+    "welcome": {
+        "fr": "Bienvenue",
+        "en": "Welcome back"
+    },
+    "name": {
+        "fr": "Nom",
+        "en": "Name"
+    },
+    "start": {
+        "fr": "Début",
+        "en": "Start"
+    },
+    "end": {
+        "fr": "Fin",
+        "en": "End"
+    },
+    "due_from": {
+        "fr": "Début",
+        "en": "Start"
+    },
+    "due_to": {
+        "fr": "Fin",
+        "en": "End"
+    },
+    "day_of_week": {
+        "fr": "Jour",
+        "en": "Day of week"
+    },
+    "cover_image": {
+        "fr": "Image de couverture",
+        "en": "Cover Image"
+    },
+    "created_at": {
+        "fr": "Création",
+        "en": "Created at"
+    },
+    "updated_at": {
+        "fr": "Mise à jour",
+        "en": "Updated at"
+    },
+    "deleted_at": {
+        "fr": "Suppression",
+        "en": "Deleted at"
+    },
+    "key": {
+        "fr": "Clé",
+        "en": "Key"
+    },
+    "value": {
+        "fr": "Valeur",
+        "en": "Value"
+    },
+    "join_link": {
+        "fr": "Lien de la conférence",
+        "en": "Join link"
+    },
+    "direct_attached_data": {
+        "fr": "Informations directement liées",
+        "en": "Direct attached information"
+    },
+    "enterprise": {
+        "fr": "Entreprise",
+        "en": "Enterprise"
+    },
+    "user": {
+        "fr": "Utilisateur",
+        "en": "User"
+    },
+    "activities": {
+        "fr": "Activité",
+        "en": "Activity"
+    },
+    "firstname": {
+        "fr": "Prénom",
+        "en": "Firstname"
+    },
+    "lastname": {
+        "fr": "Nom",
+        "en": "Lastname"
+    },
+    "username": {
+        "fr": "Nom Complet",
+        "en": "Fullname"
+    },
+    "phone": {
+        "fr": "Téléphone",
+        "en": "Phone"
+    },
+    "phone_alt": {
+        "fr": "Téléphone (alt)",
+        "en": "Phone (alt)"
+    },
+    "administrative_function": {
+        "fr": "Fonction administrative",
+        "en": "Administrative function"
+    },
+    "avatar": {
+        "fr": "Photo de profile",
+        "en": "Avatar"
+    },
+    "email": {
+        "fr": "Adresse email",
+        "en": "Email address"
+    },
+    "email_alt": {
+        "fr": "Adresse email (alt)",
+        "en": "Email address (alt)"
+    },
+    "raised_by": {
+        "fr": "A la demande de",
+        "en": "Raised by"
+    },
+    "assignee_to": {
+        "fr": "Attribué à",
+        "en": "Assignee by"
+    },
+    "assigned_tickets": {
+        "fr": "Mes rendez-vous",
+        "en": "My appointments"
+    },
+    "taken_tickets": {
+        "fr": "Mes rendez-vous",
+        "en": "My appointments"
+    },
+    "meeting_method": {
+        "fr": "Plateforme de rencontre",
+        "en": "Meeting platform"
+    },
+    "need_support_for": {
+        "fr": "Besoin de soutien",
+        "en": "Need support for"
+    },
+    "image_copyright": {
+        "fr": "Droit sur le contenu",
+        "en": "Image copyright"
+    },
+    "business_sector": {
+        "fr": "Secteur d'activité",
+        "en": "Business sector"
+    },
+    "experience_range": {
+        "fr": "Expérience professionelle",
+        "en": "Experience range"
+    },
+    "turnover_range": {
+        "fr": "Chiffre d'affraire",
+        "en": "Turnover range"
+    },
+    "content": {
+        "fr": "Contenu",
+        "en": "Content"
+    },
+    "title": {
+        "fr": "Titre",
+        "en": "Title"
+    },
+    "privacy": {
+        "fr": "Accessibilité",
+        "en": "Privacy"
+    },
+    "answer": {
+        "fr": "Réponse",
+        "en": "Answer"
+    },
+    "goal": {
+        "fr": "Objectifs",
+        "en": "Goals"
+    },
+    "offer": {
+        "fr": "Offres",
+        "en": "Offers"
+    },
+    "website": {
+        "fr": "Site Internet",
+        "en": "Website"
+    },
+    "internet_link": {
+        "fr": "Lien Internet",
+        "en": "Internet Link"
+    },
+    "password_forgot": {
+        "fr": "Mot de passe oublié",
+        "en": "Forgot password"
+    },
+    "reset_password": {
+        "fr": "Réinit. mot de passe",
+        "en": "Reset password"
+    },
+    "reset_password_full_text": {
+        "fr": "Réinitilaliser mot de passe",
+        "en": "Reset password"
+    },
+    "reset_password_indication": {
+        "fr": "Veuillez entrer votre adresse email pour réinitilialiser votre mot de passe.",
+        "en": "Enter you email address to reset your password."
+    },
+    "reset_password_check_email_indication": {
+        "fr": "Si l'adresse email indiquée existe, vous receivrez un email pour finaliser le processus de réinitilialisation. Merci de consulter votre boîte de messagerie.",
+        "en": "If the entered email address exists, you will receive as soon as possible an email to finish the reset process. Thanks to take a look to your emails."
+    },
+    "my_profile": {
+        "fr": "Mon profil",
+        "en": "My profile"
+    },
+    "notification": {
+        "fr": "Mes notifications",
+        "en": "My notifications"
+    },
+    "filed_required": {
+        "fr": "Champ requis",
+        "en": "Required field"
+    },
+    "about": {
+        "fr": "A propos",
+        "en": "About"
+    },
+    "role": {
+        "fr": "Rôle",
+        "en": "Role"
+    }
+}

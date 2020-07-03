@@ -1,0 +1,193 @@
+<?php
+
+use function Lib\plurial_noun;
+
+require_once('./lib/plurial_noun.php');
+
+$arg_opt =  getopt('', ['port::', 'serve', 'host::', 'hidden']) ;
+
+
+$cmd = $argv;
+array_shift($cmd);
+$cmd = implode(' ', $cmd);
+// scaffold a resource class
+if(preg_match("/^create resource ./", $cmd)) {
+    $f = file_get_contents("MenuScaffold.php");
+    $class_name = str_replace('_', ' ', $argv[3]);
+    $class_name = ucwords($class_name);
+
+    $displayed_text = plurial_noun($class_name);
+
+
+    $link = strtolower($argv[3]);
+    $hidden = true;
+
+    if(array_search('--visible', $argv)) {
+        $hidden = false;
+    }
+
+    $new_res = "ResourceScaffold::define('$displayed_text', '$link', 'angle right');";
+    $res_line = preg_replace("/ResourceScaffold::render\(\)/", "$new_res\n\t\tResourceScaffold::render()", $f);
+
+    if(scaffold_resource_class_file($class_name)) {
+        if(!$hidden) {
+            if(fwrite(fopen("MenuScaffold.php", 'w'), $res_line)) {
+                echo "Task done\n";
+            }
+        } else {
+            echo "Task done\n";
+        }
+
+    } else {
+        exit("ERROR\n");
+    }
+}
+
+// scaffold a blueprint class
+else if (preg_match("/^create blueprint ./", $cmd)) {
+    $f = file_get_contents("MenuScaffold.php");
+    $class_name = str_replace('_', ' ', $argv[3]);
+    $class_name = ucwords($class_name);
+
+    $displayed_text = plurial_noun($class_name);
+
+    $link = strtolower($argv[3]);
+    $new_res = "ResourceScaffold::define('$displayed_text', '$link', 'angle right');";
+    $res_line = preg_replace("/ResourceScaffold::render\(\)/", "$new_res\n\t\tResourceScaffold::render()", $f);
+
+    if(scaffold_blueprint_class_file($class_name)) {
+        if(fwrite(fopen("MenuScaffold.php", 'w'), $res_line)) {
+            echo "Task done\n";
+        }
+    } else {
+        exit("ERROR\n");
+    }
+}
+
+else if (preg_match("/^serve( )*\w*/", $cmd)) {
+    $host =  '127.0.0.1';
+    $port = isset($arg_opt['port']) ? $arg_opt['port'] : 5000;
+
+    if(preg_match("/--host=(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})/", $cmd, $matches)) {
+        $host = $matches[1];
+    }
+
+    if(preg_match("/--port=(\d{1,4})/", $cmd, $matches)) {
+        $port = $matches[1];
+    }
+
+    serve_on($host, $port);
+}
+
+else {
+    exit("\33[31mError: invalid command\n\33[39m");
+}
+
+$cpt = 0;
+function serve_on($host = '127.0.0.1', int $port = 8000) {
+    global $cpt;
+
+    if($cpt > 9) {
+        exit();
+    }
+
+    echo "\033[34mPHP adminer development server started: http://$host:$port\33[39m\n";
+    if(exec("php -S $host:$port", $arr)) {
+    } else {
+        ++$port;
+        $cpt++;
+        serve_on($host, $port);
+    }
+}
+
+function scaffold_blueprint_class_file($class) {
+    $class = ucwords($class);
+    $class = str_replace(" ", '', $class);
+    $class = str_replace("_", '', $class);
+
+    $scaffold =  <<<EOT
+<?php
+namespace App\Resources;
+
+class $class extends BaseBlueprint {
+    protected \$url_set = [
+        "list"=>"",
+        "create"=>"",
+        "show"=>"",
+        "update"=>"",
+        "delete"=>"",
+    ];
+
+    // protected \$paginate = [
+    //     'data_field'=>'',
+    //     'count'=>'',
+    //     'last_page'=>'',
+    // ];
+
+    // protected \$column_scaffold =  [];
+
+}
+
+?>
+
+EOT;
+
+try {
+    $file = "app/resources/$class.php";
+    if(file_exists($file)) {
+        return true;
+    }
+    if(touch($file)) {
+        fwrite(fopen($file, 'w'), $scaffold);
+        return true;
+    }
+    return false;
+} catch (\Throwable $th) {
+    throw $th;
+}
+
+}
+
+
+function scaffold_resource_class_file($class) {
+    $class = ucwords($class);
+    $class = str_replace(" ", '', $class);
+    $class = str_replace("_", '', $class);
+
+    $scaffold =  <<<EOT
+<?php
+
+namespace App\Resources;
+
+use Abstracts\Resource;
+use Services\Presenter;
+
+class $class extends Resource {
+
+    public function handle(array \$data = [])
+    {
+
+    }
+}
+
+?>
+EOT;
+
+try {
+    $file = "app/resources/$class.php";
+    if(file_exists($file)) {
+        return true;
+    }
+    if(touch($file)) {
+        fwrite(fopen($file, 'w'), $scaffold);
+        return true;
+    }
+    return false;
+} catch (\Throwable $th) {
+    throw $th;
+}
+
+}
+
+
+?>
