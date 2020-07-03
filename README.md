@@ -1,8 +1,42 @@
-> # PHP API ADMIN +, Your API, Your rules
+> # PHP ADMINER, Your API, Your rules
 
 ### What is "PHP API ADMIN +"
 
 "PHP API ADMIN +" is an admin panel + CRUD generator fully made 100% in PHP. It generate the CRUD based on the responses sent by your api. That means, "PHP API ADMIN +" it is not a part of you api. So create your API using any language or framework, and scaffold your CRUD anyway.
+
+### Installation
+
+1. Clone the project
+
+   ```sh
+   git clone https://github.com/Chris-Nilson/php_adminer.git
+   ```
+
+2. Move to php_adminer directory
+
+   ```sh
+   cd php_adminer
+   ```
+
+3. Make a copy of `.env_example.json` to  `.env.json`
+
+   ```sh
+   cp .env_example .env.json
+   ```
+
+4. Edit your `.env.json` file to fit your needs
+
+   ```sh
+   vim .env.json
+   ```
+
+5. Serve your project
+
+   ```sh
+   php adminer serve
+   ```
+
+   
 
 ### Base configurations
 
@@ -16,26 +50,28 @@
     "must_auth" :true,
     "login_endpoint" : "/login",
     "login_method" : "GET",
-    "app_name" : "Rent App",
+    "app_name" : "Adminer",
     "lang": "en",
-    "icon":""
+    "icon":"",
+    "date_format" : "d/m/Y",
+    "debug":true
 }
 ```
 
 
 
-### Serve your project
+### Serve an adminer project
 
-Basic command - serve on 127.0.0.1 on port 5000
+The basic command `php adminer serve` will serve the project in `localhost` on port `5000`
 
-```shell
+```sh
 php adminer serve
 # PHP adminer development server started: http://127.0.0.1:5000
 ```
 You can use `--host`  and `--port` options to specify the host and port on which you want to serve your project
 
 ```bash
-php adminer serve --host --port 
+php adminer serve --host=the_host_ip --port=the_port_to_serve_on
 ```
 
 Ex
@@ -69,11 +105,19 @@ Ex
 php adminer create User
 ```
 
-Will create new class located in `app/reources/User.php`
+Will create new class located in `app/resources/User.php`
+
+When creating a new blueprint, a new line will be added to the menu definition using the class `MenuScaffold` in  `MenuScaffold.php` 
+
+```php
+ResourceScaffold::define('Users', 'user', 'chevron right');
+```
+
+
 
 #### Complete the blueprint class
 
-Once the blueprint created, complete the `$url_set` class method where it must be specified the endpoints for listing, showing single element, deleting, creating/saving and updating. To specified that `PHP API ADMIN +` must add the concerned `id`, just make it know by adding `{id}` at the place.
+Once the blueprint created, complete the `$url_set` class attribute where it must be specified the endpoints for listing, showing single element, deleting, creating/saving and updating. To specified that `PHP API ADMIN +` must add the concerned `id`, just make it know by adding `{id}` at the place.
 
 As the `base_url` is set in the `env` file, `PHP API ADMIN +` will append each endpoint to it.
 
@@ -87,7 +131,7 @@ protected $url_set = [
 ];
 ```
 
-Let's assume the `base_url` is defined as follow 
+Let's assume the `base_url` is defined as follow in `.env.json`
 
 ```json
 {
@@ -97,7 +141,7 @@ Let's assume the `base_url` is defined as follow
 }
 ```
 
-For listing, `PHP API ADMIN +` will call `http://api.mydomain.com/users`
+For listing, `PHP Adminer` will call `http://api.mydomain.com/users`
 
 ### Column Scaffolding
 
@@ -120,8 +164,12 @@ protected $column_scaffold =  [
         'sub_property' => '', # value to look for in a sub element
         'visible' => '', # is visible in table or not
         'escape_create' => '',
-        'labeled' => '',
-        'image' => '',
+        'labeled' => '', # when true, will put the cell value in a labeled tag
+        'image' => '', # specify that image type [rounded, circular, avatar]
+        'required' => '', # specify if the field is required when creating or updating 
+        'disabled' => '',	# specify if the field is disabled 
+        'option_image' => '', # add an image in the dropdown (when object) 
+        'callback' => '', # a closure to call on each value (method must exists)
     ],
     ...,
 ]
@@ -129,7 +177,7 @@ protected $column_scaffold =  [
 
 
 
-
+Not all of these specification you will need. Just use what you need
 
 ### Resource
 
@@ -139,10 +187,10 @@ protected $column_scaffold =  [
 php adminer create resource resource_name
 ```
 
-- Hidden resource
+- Visible resource (will be added at the left side menu)
 
 ```shell
-php adminer create resource resource_name --hidden
+php adminer create resource resource_name --visible
 ```
 
 
@@ -170,7 +218,7 @@ class Profile extends Resource {
 
 Resources and Blueprints must extend `Abstracts\Resource` interface and overwrite the `handle` method.
 
-For any action, write the rules in the `handle` method. Use the `$request` static attribute of `Request` class and handle actions request based. 
+For any action, write the rules in the `handle` method. Use the `$request` static attribute of `Request` class to handle actions on request based. 
 
 #### The `Resource` class
 
@@ -226,7 +274,15 @@ You can use the `redirect` static method to redirect from one resource to anothe
 Router::redirect('dashboard');
 ```
 
+### Public Routes
 
+By default, all routes will be private when `must_auth` is true. That means, user must be authenticated before accessing the main screen otherwise the login page will be shown up. Sometime you will need to access certain pages without being authenticated. To do so, edit the `routes`  attribute of `PublicResource` class. Add all the routes you want to make public
+
+```php
+private static $routes = [
+    '/password_reset', '/logout',
+];
+```
 
 ### Request
 
@@ -237,11 +293,9 @@ Request::$request; // Object
 Request::$request->email; 
 ```
 
-
-
 ### Auth
 
-`Auth` class is used to authenticate the use user who want to log in. `Auth` attempt authentication by sending `email` and `password` to the `login` endpoint specified on the basic configuration in`.env` file.
+`Auth` class is used to authenticate the use user who want to log in. `Auth` attempt authentication by sending `email` and `password` to the `login` endpoint specified on the basic configuration in`.env.json` file.
 
 If you authenticate user using different type of variable name, not `email` or `password`, your are free to change it.
 
@@ -249,7 +303,7 @@ Once the API respond with data, `Auth` will look for `token` key in the response
 
 ### Authenticateable
 
-`PHP API ADMIN +` uses the `Authenticateable` class to determiner if it might authenticate the user or not before pursuing. Of course, you do not need to change anything, else in `.env` file by setting the `must_auth` `true` or `false`.
+`PHP API ADMIN +` uses the `Authenticateable` class to determiner if it might authenticate the user or not before pursuing. Of course, you do not need to change anything, else in `.env.json` file by setting the `must_auth` `true` or `false`.
 
 ### API
 
@@ -269,3 +323,54 @@ $api->response(); // return the response of curl
 ```php
 $api->header('Content-Type', 'application/json');
 ```
+
+### Translation
+
+Adminer provide a multi language support dictionary based. By default, adminer will put  errors text, buttons text, ... in English.  To change this, change the `lang` value in `.env.json` to what you want.
+
+You can change or add new translation using the `.translations.json` file. It is structured as follow
+
+```json
+{
+    "word" {
+    	"lang1" : "value for lang1",
+    	"lang2" : "value for lang2"
+	}
+}
+```
+
+
+
+Example:
+
+ ```json
+"create": {
+    "fr": "Nouveau",
+    "en": "Create"
+},
+"delete": {
+    "fr": "Supprimer",
+    "en": "Remove"
+},
+"show": {
+    "fr": "Afficher",
+    "en": "Show"
+},
+"edit": {
+    "fr": "Modifier",
+    "en": "Edit"
+},
+ ```
+
+To get a translation use `translate` static method of `Translation` class
+
+```php
+Translation::translate("create")
+```
+
+If the definition on the set language doesn't exist in the `.translations.json` file, the values passed to `translate` method will return without any change.
+
+
+
+PHP adminer comes with some words in `.translations.json` file in English and French. You can change them by adding others languages or updating the values of already existing languages. To keep adminer working properly, it is not recommended to changes these words.
+

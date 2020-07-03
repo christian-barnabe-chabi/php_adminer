@@ -8,7 +8,7 @@ function app($key) {
 
         $env = "";
 
-        if(!is_file($_SERVER['DOCUMENT_ROOT']."/.env")) {
+        if(!is_file($_SERVER['DOCUMENT_ROOT']."/.env.json")) {
             Presenter::present('generics.top_error', [
                 "error_info"=>'Config Failure',
                 "error_code"=>111,
@@ -17,7 +17,7 @@ function app($key) {
             exit();
         }
 
-        $file = fopen($_SERVER['DOCUMENT_ROOT']."/.env", "r");
+        $file = fopen($_SERVER['DOCUMENT_ROOT']."/.env.json", "r");
 
         while($line = fgets($file)) {
             $env .= $line;

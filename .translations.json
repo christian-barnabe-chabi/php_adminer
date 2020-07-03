@@ -1,0 +1,130 @@
+{
+    "create": {
+        "fr": "Nouveau",
+        "en": "Create"
+    },
+    "delete": {
+        "fr": "Supprimer",
+        "en": "Remove"
+    },
+    "show": {
+        "fr": "Afficher",
+        "en": "Show"
+    },
+    "edit": {
+        "fr": "Modifier",
+        "en": "Edit"
+    },
+    "export": {
+        "fr": "Exporter",
+        "en": "Export"
+    },
+    "save": {
+        "fr": "Sauvegarder",
+        "en": "Save"
+    },
+    "update": {
+        "fr": "Mettre à jour",
+        "en": "Update"
+    },
+    "back": {
+        "fr": "Retour",
+        "en": "back"
+    },
+    "logout": {
+        "fr": "Déconnexion",
+        "en": "Log out"
+    },
+    "login": {
+        "fr": "Connexion",
+        "en": "Log in"
+    },
+    "password": {
+        "fr": "Mot de passe",
+        "en": "Password"
+    },
+    "click_to_preview": {
+        "fr": "Cliquer pour aperçu",
+        "en": "Click to preview"
+    },
+    "list_of": {
+        "fr": "Liste",
+        "en": "List"
+    },
+    "multiple_delete": {
+        "fr": "Suppression multiple",
+        "en": "Multiple delete"
+    },
+    "login_error": {
+        "fr": "Erreur: Identifiant ou mot de passe incorrect",
+        "en": "Error: Incorrect username or password "
+    },
+    "resource_not_found": {
+        "fr": "La classe de ressource introuvable pour",
+        "en": "No resource class found for"
+    },
+    "error": {
+        "fr": "Erreur",
+        "en": "Error"
+    },
+    "failure": {
+        "fr": "Échec",
+        "en": "Failed"
+    },
+    "success": {
+        "fr": "Succès",
+        "en": "Success"
+    },
+    "operation_done": {
+        "fr": "Opération achevée avec succès",
+        "en": "Operation done successfuly"
+    },
+    "the_class": {
+        "fr": "La classe",
+        "en": "The class"
+    },
+    "must_implement_method": {
+        "fr": "doit implementer la méthode",
+        "en": "must implement the method"
+    },
+    "must_implement_function": {
+        "fr": "doit implementer la function",
+        "en": "must implement the function"
+    },
+    "php_version_error": {
+        "fr": "Version de PHP non supportée",
+        "en": "PHP Version not supported"
+    },
+    "php_version_error_desc": {
+        "fr": "PHP API ADMINER requiert une version de PHP >= 6.x. Votre server tourne sous PHP",
+        "en": "PHP API ADMINER recquires PHP 6.x. Your server is runing PHP"
+    },
+    "page_not_found": {
+        "fr": "Page introuvable",
+        "en": "Not Found"
+    },
+    "permission_error": {
+        "fr": "Vous n'avez les droits pour cette action",
+        "en": "You do not have recquired permissions for this action"
+    },
+    "denied": {
+        "fr": "Niveau de permission insuffisant",
+        "en": "Permission Error"
+    },
+    "welcome": {
+        "fr": "Bienvenue",
+        "en": "Welcome back"
+    },
+    "key": {
+        "fr": "Clé",
+        "en": "Key"
+    },
+    "value": {
+        "fr": "Valeur",
+        "en": "Value"
+    },
+    "password_forgot": {
+        "fr": "Mot de passe oublié",
+        "en": "Forgot password"
+    }
+}

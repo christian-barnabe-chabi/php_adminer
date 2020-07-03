@@ -12,7 +12,7 @@ class Translation {
         $lang = app('lang');
 
         if(self::$translations == null) {
-            $file = fopen($_SERVER['DOCUMENT_ROOT']."/.translations", "r");
+            $file = fopen($_SERVER['DOCUMENT_ROOT']."/.translations.json", "r");
             $file_lines = '';
             while($line = fgets($file)) {
                 $file_lines .=  $line;

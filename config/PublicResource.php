@@ -5,7 +5,7 @@ namespace Config;
 class PublicResource {
 
     private static $routes = [
-        '/password_reset', '/logout', '/untracked_ticket/create', '/untracked_ticket/save'
+        '/password_reset', '/logout',
     ];
 
     public static function routes() {

@@ -12,9 +12,6 @@ use Services\Translation;
 
 require_once($_SERVER['DOCUMENT_ROOT'].'/lib/autoload.php');
 
-// var_dump($_SERVER['REQUEST_URI']);
-// exit();
-
 if(app('must_auth') && !in_array($_SERVER['REQUEST_URI'], PublicResource::routes())) {
     Authenticateable::auth();
 } else {
