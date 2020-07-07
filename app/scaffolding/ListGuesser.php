@@ -194,12 +194,10 @@ class ListGuesser {
 
 
                                 // tooltip
-                                // $tooltip = self::$columns[$column_name]['tooltip'];
                                 $tooltip = $column->tooltip;
                                 $tooltip = empty($tooltip) ? '' :  "data-tooltip='{$tooltip}'";
 
                                 // css classes
-                                // $labeled = self::$columns[$column_name]['css_class'];
                                 $labeled = $column->labeled;
                                 $labeled = "class='{$labeled}'";
 
@@ -208,10 +206,9 @@ class ListGuesser {
                                 // categoty.name becomes category, name
                                 $sub_element = explode('.', $column_name);
 
-                                //column is an array or object and sub_property set
+                                //column is an array or object
                                 if(count($sub_element) > 1){
                                     // todo
-                                    // $value = 'null';
                                     $current_level = $obj;
                                     foreach ($sub_element as $level) {
                                         if(isset($current_level->$level)) {
@@ -219,6 +216,8 @@ class ListGuesser {
                                         }
                                     }
                                     // final value
+                                    // TODO handle object array
+                                    
                                     if(!is_array($current_level) && !is_object(($current_level))) {
 
                                         if($callback_return = self::callback($column_name, $current_level)) {
@@ -246,8 +245,8 @@ class ListGuesser {
                                 }
 
                                 // column is an object and no sub_property set or set explicitly
-                                if (isset($obj->$column_name) && is_object($obj->$column_name)) {
-                                    $sub_property = isset($column->sub_property) ? $column->sub_property : 'id';
+                                if (is_object($obj->$column_name)) {
+                                    $sub_property = $column->relation;
 
                                     if (isset($obj->$column_name->$sub_property)) {
                                         $cell_value = $obj->$column_name->$sub_property;
@@ -274,7 +273,7 @@ class ListGuesser {
 
                                 // TODO implement callback
                                 // column is an array and no sub_property set or set explicitly
-                                if (isset($obj->$column_name) && is_array($obj->$column_name)) {
+                                if (is_array($obj->$column_name)) {
                                     if (empty($obj->$column_name)) {
                                         $cell_values .= "";
                                     } else {
@@ -282,39 +281,10 @@ class ListGuesser {
                                             //TODO
 
                                             $val = ((Array)$value)[$sub_property];
-                                            $sub_property = isset($column->sub_property) ? $column->sub_property : 'id';
+                                            $sub_property = $column->relation;
                                             if (isset($value->$sub_property)) {
 
-                                                // image
-                                                if(preg_match('/\w*\.(jpeg|png|bmp|gif|jpg|ico|tiff)/', $val)) {
-                                                    $form = '';       
-                                                    if(isset($column->image)) {
-                                                        $form = $column->image;
-                                                    }
-
-                                                    $form = in_array($form, ['rounded', 'circular']) ? $form : 'rounded';
-                                                    $cell_values .= "<span {$tooltip} {$labeled}>".
-                                                            "<img src='{$val}'
-                                                            class='ui $form image mini' alt='' >"
-                                                        ."</span>";
-                                                    continue;
-                                                }
-
-                                                $val = DateFormater::format(app('date_format'), $val);
-
-                                                // links
-                                                $re1 = '/(http(s)?:\/\/)(www.)?((\w|-|_)+\.\w{2,5}(\/(\w|\?|\=|-|_)*)*)/i';
-                                                $re2 = '/(\w+((\.|-|_)?(\w)+)*@(\w+|-|_|\.)+\.\w{2,5})/i';
-                                                if(preg_match($re1, $val) || preg_match($re2, $val)) {
-                                                    $val = preg_replace($re1, "<a href='$1' target='_blank'>". Translation::translate('internet_link') ."</a>", $val);
-                                                    $val = preg_replace($re2, "<a href='mailto:$1' target='_blank'>$1</a>", $val);
-                                                    $show_link = '';
-
-                                                    $cell_values .= "<span {$labeled}>". $val ."</span>";
-                                                    continue;
-                                                }
-
-                                                $cell_values .= "<span {$labeled}>". str_cut($val, $sample_length) ."</span>";
+                                                $cell_values .= "<span {$labeled}>". self::build_cell($column, $val, $show_link, $column->tooltip, $column->labeled) ."</span>";
                                             } else {
                                                 $labeled = "class='ui label red uk-text-center'";
                                                 $tooltip = "data-tooltip='id missing/sub_property not set'";

@@ -110,7 +110,7 @@ function scaffold_blueprint_class_file($class) {
 namespace App\Resources;
 
 class $class extends BaseBlueprint {
-    protected \$url_set = [
+    protected \$enpoints = [
         "list"=>"",
         "create"=>"",
         "show"=>"",

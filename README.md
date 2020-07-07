@@ -43,14 +43,15 @@
 ```json
 {
     "base_url" : "http://chrisserver.me:8000/api",
+    "origin" : "http://chrisserver.me:8000",
     "entrypoint" : "dashboard",
-    "primary_color" : "blue",
+    "primary_color" : "green",
     "colorful" : true,
     "auth_type" : "Bearer",
-    "must_auth" :true,
+    "must_auth" :false,
     "login_endpoint" : "/login",
     "login_method" : "GET",
-    "app_name" : "Adminer",
+    "app_name" : "PHP Adminer v2.0",
     "lang": "en",
     "icon":"",
     "date_format" : "d/m/Y",
@@ -110,19 +111,19 @@ Will create new class located in `app/resources/User.php`
 When creating a new blueprint, a new line will be added to the menu definition using the class `MenuScaffold` in  `MenuScaffold.php` 
 
 ```php
-ResourceScaffold::define('Users', 'user', 'chevron right');
+ResourceScaffold::define('Users', 'user', 'angle right');
 ```
 
 
 
 #### Complete the blueprint class
 
-Once the blueprint created, complete the `$url_set` class attribute where it must be specified the endpoints for listing, showing single element, deleting, creating/saving and updating. To specified that `PHP ADMINER` must add the concerned `id`, just make it know by adding `{id}` at the place.
+Once the blueprint created, complete the `$endpoints` class attribute where it must be specified the endpoints for listing, showing single element, deleting, creating/saving and updating. To specified that `PHP ADMINER` must add the concerned `id`, just make it know by adding `{id}` at the place.
 
 As the `base_url` is set in the `env` file, `PHP ADMINER` will append each endpoint to it.
 
 ```php
-protected $url_set = [
+protected endpoints = [
     "list"=>"/users",
     "show"=>"/users/{id}",
     "delete"=>"/users/{id}",
@@ -150,20 +151,17 @@ protected $column_scaffold =  [
     ..., 
     'column_name' => [
         'type' => '', # object | array | text | password | date | datetime
-        'css_class' => '', # css class name - must be implemented to work
         'tooltip' => '', # tooltip
         'replacements' => [], # replacement of values
         'name' => '', # name to show up on table or labels
-        'variable_name' => '', # form variable name
-        'fetch_url' => '', # fetch url for checkboxes or dropdowns
-        'fetch_method' => '', # fetch method for checkboxes or dropdowns
-        'displayed_text' => '', # displayed field for checkboxes or dropdowns
-        'relation_field' => '', # relationship binder for checkboxes or dropdowns
-        'escape_edit' => '', # is editable or not
+        'variable' => '', # form variable name
+        'endpoint' => '', # fetch url for checkboxes or dropdowns
+        'method' => '', # fetch method for checkboxes or dropdowns
+        'relation' => '', # relationship binder for checkboxes or dropdowns
+        'editable' => '', # is editable or not
         'values' => [], # values if not from url
-        'sub_property' => '', # value to look for in a sub element
         'visible' => '', # is visible in table or not
-        'escape_create' => '',
+        'createable' => '',
         'labeled' => '', # when true, will put the cell value in a labeled tag
         'image' => '', # specify that image type [rounded, circular, avatar]
         'required' => '', # specify if the field is required when creating or updating 

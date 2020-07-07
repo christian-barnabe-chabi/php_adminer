@@ -12,16 +12,14 @@ use Services\API;
 use Services\Auth;
 use Services\Presenter;
 use Services\Request;
-use Services\Translation;
 
 abstract class BaseBlueprint extends Resource {
     protected $url;
-    protected $url_set;
+    protected $endpoints;
     protected $guarded = ['id', 'created_at', 'updated_at', 'deleted_at'];
     protected $column_scaffold = [];
     protected $data_fetched;
     protected $must_be_auth = true;
-    protected $data;
     protected $api;
     protected $createable = true;
     protected $editable = true;
@@ -31,10 +29,11 @@ abstract class BaseBlueprint extends Resource {
     protected $model = null;
     protected $hidden = [];
     protected $paginate = false;
-    protected $name = false;
-    private $action; // request action -
+    protected $title = [];
     protected $callbacks = [];
     protected $widgets_positions = [];
+    private   $data;
+    private   $action; // request action -
 
     public function __construct()
     {
@@ -68,8 +67,7 @@ abstract class BaseBlueprint extends Resource {
             // updating or saving or deleting or exporting
         } else {
 
-            $this->url = app('base_url').$this->url_set["list"];
-
+            $this->url = app('base_url').$this->endpoints["list"];
 
             // pagination
             if($this->paginate) {
@@ -111,13 +109,14 @@ abstract class BaseBlueprint extends Resource {
 
             try {
                 if(!is_array($this->data_fetched)) {
-                    throw new Exception;
+                    $exception = new Exception("Exception: An array is required for listing");
+                    throw $exception;
                 }
                 $keys = $this->data_fetched[0] ?? null;
             } catch (Exception $e) {
                 Presenter::present('generics.global_error', [
                     'error_code'=>500,
-                    'error_description'=>'The received data is not an array but of "'. get_class($this->data_fetched) .'" type. Are you getting paginated data?'
+                    'error_description' => $e->getMessage().'<br>Make sure the data is not null or are you getting paginated data?'
                 ]);
                 exit('Error');
             }
@@ -242,11 +241,10 @@ abstract class BaseBlueprint extends Resource {
          */
         else if(isset($this->action->php_admin_update)) {
             echo "<h3 class=' uk-heading-divider'>". $this->go_back() . $this->get_name_singular() ."</h3>";
-            // echo "<h3 class=' uk-heading-divider'>". $this->go_back() .Translation::translate('update'). " {$this->model} #". $this->action->uid ."</h3>";
 
             $this->validate(['uid'=>'']);
 
-            $this->url = app('base_url').$this->url_set["update"];
+            $this->url = app('base_url').$this->endpoints["update"];
 
             $this->update((Array) $this->data);
 
@@ -261,7 +259,7 @@ abstract class BaseBlueprint extends Resource {
 
             $this->validate(['uid'=>'']);
 
-            $this->url = app('base_url').$this->url_set["show"];
+            $this->url = app('base_url').$this->endpoints["show"];
 
             $this->edit();
         }
@@ -275,7 +273,7 @@ abstract class BaseBlueprint extends Resource {
             
             $this->validate(['uid'=>'']);
             
-            $this->url = app('base_url').$this->url_set["show"];
+            $this->url = app('base_url').$this->endpoints["show"];
         
             $this->show();
         }
@@ -288,7 +286,7 @@ abstract class BaseBlueprint extends Resource {
 
             $this->validate(['uid'=>'']);
 
-            $this->url = app('base_url').$this->url_set["delete"];
+            $this->url = app('base_url').$this->endpoints["delete"];
 
             $this->delete();
         }
@@ -302,7 +300,7 @@ abstract class BaseBlueprint extends Resource {
             $this->validate(['selected_id'=>'No selected resources to delete']);
 
             foreach ($this->data->selected_id as $id) {
-                $this->url = app('base_url').$this->url_set["delete"];
+                $this->url = app('base_url').$this->endpoints["delete"];
                 $this->action->uid = $id;
                 $this->delete(true);
             }
@@ -327,7 +325,7 @@ abstract class BaseBlueprint extends Resource {
         else if( isset($this->action->php_admin_save)) {
             echo "<h3 class=' uk-heading-divider'>". $this->go_back() . $this->get_name_singular() ."</h3>";
 
-            $this->url = app('base_url').$this->url_set["create"];
+            $this->url = app('base_url').$this->endpoints["create"];
             $this->save((Array)$this->data);
         }
 
@@ -339,7 +337,7 @@ abstract class BaseBlueprint extends Resource {
 
             $this->validate(['selected_id'=>'No selected resources to export']);
 
-            $this->url = app('base_url').$this->url_set["show"];
+            $this->url = app('base_url').$this->endpoints["show"];
 
             $this->export($this->data->selected_id);
         }
@@ -408,7 +406,7 @@ abstract class BaseBlueprint extends Resource {
 
     protected function save(Array $data, $method = "POST") {
 
-        $this->url = app('base_url').$this->url_set["create"];
+        $this->url = app('base_url').$this->endpoints["create"];
 
         $this->api->callWith($this->url, $method, $data);
 
@@ -432,7 +430,7 @@ abstract class BaseBlueprint extends Resource {
         if(!$this->editable) {
             Presenter::present('generics.unauthorised', []);
         }
-        $this->url = app('base_url').$this->url_set["show"];
+        $this->url = app('base_url').$this->endpoints["show"];
         EditGuesser::render($this, $this->action->uid);
     }
 
@@ -455,7 +453,7 @@ abstract class BaseBlueprint extends Resource {
     }
 
     protected function show() {
-        $this->url = app('base_url').$this->url_set["show"];
+        $this->url = app('base_url').$this->endpoints["show"];
         ShowGuesser::render($this, $this->action->uid);
     }
 
@@ -466,7 +464,7 @@ abstract class BaseBlueprint extends Resource {
             exit();
         }
 
-        $this->url = app('base_url').$this->url_set["delete"];
+        $this->url = app('base_url').$this->endpoints["delete"];
         $this->url = preg_replace('/{id}/', $this->action->uid, $this->url);
 
         $this->api->callWith($this->url, $method);
@@ -496,7 +494,7 @@ abstract class BaseBlueprint extends Resource {
 
 
         $objects = [];
-        $this->url = app('base_url').$this->url_set["show"];
+        $this->url = app('base_url').$this->endpoints["show"];
         foreach ($selected_ids as $id) {
             $url = preg_replace('/{id}/', $id, $this->url);
             $this->api->get($url);
@@ -563,11 +561,11 @@ abstract class BaseBlueprint extends Resource {
     }
 
     private function get_name_singular() {
-        return $this->name['one'] ?? $this->model;
+        return $this->title['one'] ?? $this->model;
     }
 
     private function get_name_plurial() {
-        return $this->name['many'] ?? $this->model;
+        return $this->title['many'] ?? $this->model;
     }
 }
 

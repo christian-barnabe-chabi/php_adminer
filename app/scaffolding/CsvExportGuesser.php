@@ -72,7 +72,7 @@ class CsvExportGuesser {
                     $sub_property = isset($sub_element[1]) ? $sub_element[1] : 'id';
 
                     // TODO check if it works
-                    $sub_property = isset($column->sub_property) ? $column->sub_property : $sub_property;
+                    $sub_property = $column->relation;
 
                     // array (list as it is - checkbox)
                     if(is_array($obj->$entry_child)) {
@@ -102,7 +102,7 @@ class CsvExportGuesser {
                     // column is an object and no sub_property set or set explicitly
                     if (is_object($obj->$column_name)) {
                         
-                        $sub_property = isset($column->sub_property) ? $column->sub_property : 'id';
+                        $sub_property = $column->relation;
                         
                         if (isset($obj->$column_name->$sub_property)) {
                             $cell_value .= $obj->$column_name->$sub_property;
@@ -121,7 +121,7 @@ class CsvExportGuesser {
                         } else {
                             foreach ($obj->$column_name as $key => $value) {
                                 //TODO
-                                $sub_property = isset($column->sub_property) ? $column->sub_property : 'id';
+                                $sub_property = $column->relation;
                                 if (isset($value->$sub_property)) {
                                     $cell_values .= ucfirst(((Array)$value)[$sub_property]);
                                 } else {

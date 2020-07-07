@@ -45,15 +45,12 @@ if(!empty(Auth::user())):
 
             <!-- notification -->
             <?php
-                $api = new API();
-                $api->header("Authorization", app('auth_type').' '.Auth::token());
-                $api->get(app('base_url').'notifications/count');
+                // get notfication count to $notifications_count
+                $notifications_count = 4;
             ?>
             <a href="<?= Resource::link('notification') ?>" class="item ui floating tiny button icon circular" style="margin: 0px;">
                 <i class="ui bell outline large icon"></i>
-                <?php if($api->response()): ?>
-                    <span class="ui floating circular basic mini label <?= $primary_color ?>"><?= $api->response() ?></span>
-                <?php endif; ?>
+                <span class="ui floating circular basic mini label <?= $primary_color ?>"><?= $notifications_count ?></span>
             </a>
 
 
