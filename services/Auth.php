@@ -12,12 +12,14 @@ class Auth {
 
     public function __construct($email = "", $password = "")
     {
+
         $api = new API();
 
         $data = [
             "email"=>Request::$request->email,
             "password"=>Request::$request->password
         ];
+        
 
         $url = app('base_url').app('login_endpoint');
 
@@ -38,7 +40,7 @@ class Auth {
     }
 
     public static function token() {
-        if(($_SESSION['oauth'])) {
+        if(isset($_SESSION['oauth'])) {
             return deep_walk((Array)$_SESSION['oauth'], 'token');
         } else {
             return null;

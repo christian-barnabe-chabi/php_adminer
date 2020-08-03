@@ -32,6 +32,11 @@ class CsvExportGuesser {
                 continue;
             }
 
+            // divider
+            if(preg_match("/^field_divider_\d/", $table_head)) {
+                continue;
+            }
+
             // TODO check if the column is an array or an object
 
             $sub_element = explode('.', $table_head);

@@ -1,0 +1,99 @@
+:root {
+    --primary-dark:  rgb(71, 71, 71);
+    --secondary-dark:   rgb(41, 41, 41);
+}
+
+#topNavbar, #topNavbar * > * {
+    background-color: var(--primary-dark) !important;
+    color: white !important;
+}
+
+#side-menu > .item {
+    color: rgb(179, 179, 179);
+}
+
+body, html,  #main-container {
+    background-color: var(--secondary-dark) !important;
+    color: white !important;
+}
+
+h1, h2, h3, h4, h5, h6, p {
+    color: white;
+}
+
+input[type=checkbox], input[type=radio] {
+    border: 1px solid white !important;
+}
+
+.ui.segment {
+    background-color: var(--primary-dark) !important;
+    color: white !important;
+}
+
+#main-container > .uk-heading-divider {
+    /* background-color: var(--primary-dark) !important; */
+    color: white !important;
+}
+
+.ui.modal >.header, .ui.modal >.actions {
+    background-color: var(--primary-dark) !important;
+    color: white !important;
+}
+
+.ui.modal, .ui.modal >.content, .ui.modal >.extra.content {
+    background-color: var(--secondary-dark) !important;
+    color: white !important;
+}
+
+.ui.form .field>label {
+    color: white !important;
+}
+
+.ui.segment .ui.form .field .ui.input input, .ui.segment .ui.form .field input, .ui.segment .ui.form .fields .field .ui.input input, .ui.segment textarea  {
+    background-color: var(--secondary-dark) !important;
+    color: white !important;
+}
+
+.ui.form .field .ui.input input, .ui.form .field input, .ui.form .fields .field .ui.input input, textarea  {
+    background-color: var(--primary-dark) !important;
+    color: white !important;
+}
+
+.ui.ui.segment .ui.input input, .ui.ui.segment .ui.input input, .ui.dropdown, .ui.dropdown >.menu, .menu .item  {
+    background-color: var(--secondary-dark) !important;
+    color: white !important;
+}
+
+#side-menu .item {
+    background-color: transparent !important;
+}
+
+.menu .item > input, .ui.dropdown, .ui.menu .ui.dropdown .menu>.item, .ui.menu .ui.dropdown .menu>.active.item {
+    border: none !important;
+    border-radius: 0px !important;
+    color: white !important;
+}
+
+.ui.dropdown, .ui.dropdown >.menu, .ui.dropdown >.menu .item  {
+    border: none !important;
+}
+
+input {
+    border: 0px !important;
+}
+
+.ui.segment > * {
+    color: white;
+}
+
+.ui.table>thead, .ui.table>thead tr th, .ui.table>thead tr td, tr th  {
+    background-color: var(--primary-dark) !important;
+    /* background-color: var(--secondary-dark) !important; */
+    color: white !important;
+}
+
+.ui.table>tbody, .ui.table>tbody tr th, .ui.table>tbody tr td  {
+    background-color: var(--secondary-dark) !important;
+    /* background-color: var(--primary-dark) !important; */
+    color: white;
+}

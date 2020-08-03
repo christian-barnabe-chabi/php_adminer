@@ -49,8 +49,11 @@ class TableSearchable {
                 let search_keyword = this.search_field.val().trim().toLowerCase()
                 let cell_value = target_cell.text().trim().toLowerCase()
 
+                search_keyword = search_keyword.replace("'", "\\\\'");
+                search_keyword = search_keyword.replace("?", "\\\\?");
+
                 // regex
-                var regex = new RegExp('('+search_keyword+')');
+                var regex = new RegExp(search_keyword, 'iug');
                 if(!regex.test(cell_value)) {
                     if($(row).is('tr'))
                         $(row).hide(0);

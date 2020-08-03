@@ -12,7 +12,12 @@ use Services\Translation;
             <div class="ui column aligned left">
                 <div class="uk-position-center-left">
                     <div class=''>
-                        <h3> <?= app('app_name') ?> </h3>
+                        <h1><?= app('app_name') ?></h1>
+                        <div>
+                            <div class="ui divider"></div>
+                            <span class="ui mini button black" href="#" >Action 1</span>
+                            <span class="ui mini button red" href="#">Action 2</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -23,24 +28,24 @@ use Services\Translation;
                     <div class="ui form">
                         <div class="field">
                             <label for="email"><?= Translation::translate('email') ?></label>
-                            <input id="email" type="text" placeholder="Email" name="email" value="<?= isset($data['email']) ? $data['email'] : '' ?>"  >
+                            <input required id="email" type="email" placeholder="<?= Translation::translate('email') ?>" name="email" value="<?= $data['email'] ?? '' ?>"  >
                         </div>
                         <div class="field">
                             <label for="password"><?= Translation::translate('password') ?></label>
-                            <input id="password" type="password" placeholder="Password" name="password" value="">
+                            <input required id="password" type="password" placeholder="<?= Translation::translate('password') ?>" name="password" value="">
                         </div>
                         <div class="field">
                             <button class="ui button <?= app('primary_color') ?> fluid"><?= Translation::translate('login') ?></button>
                         </div>
                         <div class="field uk-text-right">
                             <!-- <a href="<?= Resource::link('password_reset') ?>" class='uk-link-muted uk-link-reset ui label orange'> <?= Translation::translate('password_forgot') ?> </a> -->
-                            <a href="#" class='uk-link-muted uk-link-reset ui label grey'> <?= Translation::translate('password_forgot') ?> </a>
+                            <a target="_blank" href="http://45.79.221.17:8000/password/reset" class='uk-link-muted uk-link-reset ui label grey'> <?= Translation::translate('password_forgot') ?> </a>
                         </div>
                     </div>
                 </form>
             </div>
 
-            <div class="ui vertical divider"><?= Translation::translate('welcome') ?></div>
+            <div class="ui vertical divider"></div>
         </div>
     </div>
 </div>

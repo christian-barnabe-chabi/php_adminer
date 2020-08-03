@@ -22,6 +22,9 @@ class ColumnAttribute {
     public $disabled;
     public $option_image;
     public $callback;
+    public $length;
+    public $id;
+    public $class;
 
     public function __construct($column = null, $value = null)
     {
@@ -43,8 +46,11 @@ class ColumnAttribute {
         $this->image = isset($column->image) ? $column->image: false;
         $this->required = isset($column->required) && $column->required == false ? '': 'required';
         $this->disabled = isset($column->disabled) && $column->disabled == true ? 'disabled': '';
-        $this->option_image = isset($column->option_image) ? $column->option_image: null;
+        $this->option_image = isset($column->option_image) ? $column->option_image : null;
         $this->callback = isset($column->callback) ? $column->callback: null;
+        $this->length = isset($column->length) ? $column->length: 128;
+        $this->id = isset($column->id) ? $column->id: '';
+        $this->class = isset($column->class) ? $column->class: '';
     }
 
 }

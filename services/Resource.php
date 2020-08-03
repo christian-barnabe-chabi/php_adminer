@@ -13,9 +13,10 @@ class Resource
     private static $generated_code;
     private static $handle_methode_name = "handle";
 
-    public static function load(string $resource, array $data = [])
+    public static function load(string $resource, array $data = [], $handle_methode_name = 'handle')
     {
 
+        self::$handle_methode_name = $handle_methode_name;
         $resource_class = '\\App\\Resources\\'.ucwords($resource);
         $resource_class = str_replace('_', ' ', $resource_class);
         $resource_class = ucwords($resource_class);
@@ -24,7 +25,7 @@ class Resource
 
         if (class_exists($resource_class, false)) {
             
-            self::$resource = new $resource_class();
+            self::$resource = new $resource_class($data);
 
             if (method_exists(self::$resource, 'get_model_name')) {
                 self::$page_title = self::$resource->get_model_name();
@@ -37,7 +38,7 @@ class Resource
             self::open_tags();
 
             $handler = self::$handle_methode_name;
-            if (method_exists(self::$resource, $handler)) {
+            if ($handler && method_exists(self::$resource, $handler)) {
                 self::$resource->$handler($data);
                 self::close_tags();
             } else {
@@ -58,15 +59,16 @@ class Resource
             self::close_tags();
         };
         self::close_tags();
-        self::render();
+        // self::render();
         exit();
     }
 
     public static function open_tags()
     {
 
-        $title = self::$page_title;
+        $title = ucfirst(strtolower(self::$page_title));
         $favicon = app('icon');
+        $theme = app('theme', 'light') == 'night' ? "<link rel='stylesheet' href='/assets/css/night.css'>" : "";
         echo "
         <!DOCTYPE html>
         <html lang='en'>
@@ -89,6 +91,7 @@ class Resource
             <script src='/assets/js/paginator.js' defer></script>
             <script src='/assets/js/table_search.js' defer></script>
             <script src='/assets/js/example.js' defer></script>
+            $theme
         </head>
         <body class='uk-margin-remove uk-padding-remove'>
         ";
@@ -122,6 +125,83 @@ class Resource
 
     public static function link($resource) {
         return "/$resource";
+    }
+
+    public static function show(string $resource, array $data = [], $handle_methode_name = "handle")
+    {
+
+        self::$handle_methode_name = $handle_methode_name;
+        $resource_class = '\\App\\Resources\\'.ucwords($resource);
+        $resource_class = str_replace('_', ' ', $resource_class);
+        $resource_class = ucwords($resource_class);
+        $resource_class = str_replace(' ', '', $resource_class);
+
+
+        if (class_exists($resource_class, false)) {
+            
+            self::$resource = new $resource_class();
+
+            if (method_exists(self::$resource, 'get_model_name')) {
+                self::$page_title = self::$resource->get_model_name();
+            } else {
+                self::$page_title = Translation::translate($resource);
+            }
+    
+            self::$page_title = str_replace('_', ' ', self::$page_title);
+            self::$page_title = ucfirst(strtolower(self::$page_title)).' | '.app('app_name');
+
+            $handler = self::$handle_methode_name;
+            if (method_exists(self::$resource, $handler)) {
+                self::$resource->$handler($data);
+            } else {
+                Presenter::present("generics.error", [
+                    "error_info" => Translation::translate('failure'),
+                    "error_code" => 87,
+                    "error_description"=>Translation::translate('the_class')."'". get_class(self::$resource) ."' ". Translation::translate('must_implement_method') ." '".self::$handle_methode_name."'"
+                ]);
+            }
+        } else {
+            self::open_tags();
+            Presenter::present("generics.error", [
+                "error_info" => Translation::translate('failure'),
+                "error_code" => 90,
+                "error_description"=> Translation::translate('resource_not_found')." '".$resource_class."'"
+            ]);
+            self::close_tags();
+        };
+        
+        self::render();
+        // exit();
+    }
+
+    public static function call(string $resource, array $data = [], $handle_methode_name = "handle")
+    {
+
+        self::$handle_methode_name = $handle_methode_name;
+
+        if (class_exists($resource, false)) {
+            
+            self::$resource = new $resource();
+
+            $handler = self::$handle_methode_name;
+            if (method_exists(self::$resource, $handler)) {
+                return self::$resource->$handler($data);
+            } else {
+                Presenter::present("generics.error", [
+                    "error_info" => Translation::translate('failure'),
+                    "error_code" => 87,
+                    "error_description"=>Translation::translate('the_class')."'". get_class(self::$resource) ."' ". Translation::translate('must_implement_method') ." '".self::$handle_methode_name."'"
+                ]);
+            }
+        } else {
+            self::open_tags();
+            Presenter::present("generics.error", [
+                "error_info" => Translation::translate('failure'),
+                "error_code" => 90,
+                "error_description"=> Translation::translate('resource_not_found')." '".$resource."'"
+            ]);
+            self::close_tags();
+        };
     }
 }
 

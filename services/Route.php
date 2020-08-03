@@ -34,14 +34,14 @@ class Route {
                 if (method_exists($class, $method)) {
                     $class->$method($params);
                 } else {
-                    Presenter::present("generics.top_error", [
+                    Presenter::present("generics.error", [
                         "error_info" => "Failed",
                         "error_code" => 87,
                         "error_description"=>"Class '". get_class($class) ."' must implement '".$method."' method"
                     ]);
                 }
             } else {
-                Presenter::present("generics.top_error", [
+                Presenter::present("generics.error", [
                     "error_info" => "Failed",
                     "error_code" => 90,
                     "error_description"=>"No resource class found for '".$class."'"

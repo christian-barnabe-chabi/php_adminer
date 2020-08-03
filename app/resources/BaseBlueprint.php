@@ -5,13 +5,17 @@ use Abstracts\Resource;
 use App\Scaffolding\CreateGuesser;
 use App\Scaffolding\CsvExportGuesser;
 use App\Scaffolding\EditGuesser;
+use App\Scaffolding\EditGuesserModal;
 use App\Scaffolding\ListGuesser;
 use App\Scaffolding\ShowGuesser;
+use Config\PublicResource;
 use Exception;
 use Services\API;
 use Services\Auth;
 use Services\Presenter;
 use Services\Request;
+use Services\Router;
+use Services\Translation;
 
 abstract class BaseBlueprint extends Resource {
     protected $url;
@@ -32,13 +36,15 @@ abstract class BaseBlueprint extends Resource {
     protected $title = [];
     protected $callbacks = [];
     protected $widgets_positions = [];
-    private   $data;
-    private   $action; // request action -
+    protected   $data;
+    protected   $action; // request action -
 
     public function __construct()
     {
 
         $data = clone Request::$request;
+        $this->action = clone (Object) $data;
+        
         unset($data->php_admin_resource);
         unset($data->uid);
         unset($data->php_admin_admin_edit);
@@ -108,13 +114,21 @@ abstract class BaseBlueprint extends Resource {
             }
 
             try {
-                if(!is_array($this->data_fetched)) {
-                    $exception = new Exception("Exception: An array is required for listing");
-                    throw $exception;
+                if(PublicResource::isPublic(Router::route())) {
+
+                } else {
+                    // if(!is_array($this->data_fetched)) {
+                    //     throw new Exception("Exception: An array is required for listing");
+                    // }
+                    $keys = $this->data_fetched[0] ?? null;
                 }
-                $keys = $this->data_fetched[0] ?? null;
+
+                if(isset($keys))
+                    $keys = $keys != null ? (get_object_vars($keys)) : [];
+
             } catch (Exception $e) {
-                Presenter::present('generics.global_error', [
+                Presenter::present('generics.error', [
+                    'url' => $this->url,
                     'error_code'=>500,
                     'error_description' => $e->getMessage().'<br>Make sure the data is not null or are you getting paginated data?'
                 ]);
@@ -122,7 +136,7 @@ abstract class BaseBlueprint extends Resource {
             }
 
 
-            $keys = $keys != null ? (get_object_vars($keys)) : [];
+            // $keys = $keys != null ? (get_object_vars($keys)) : [];
 
             if (empty($this->column_scaffold)) {
                 // if()
@@ -233,7 +247,7 @@ abstract class BaseBlueprint extends Resource {
         if(isset($this->action->php_admin_create)) {
             echo "<h3 class=' uk-heading-divider'>". $this->go_back() . $this->get_name_singular() ."</h3>";
 
-            $this->create();
+            echo $this->create();
         }
 
         /**
@@ -251,7 +265,7 @@ abstract class BaseBlueprint extends Resource {
         }
 
         /**
-         * shoe edit form
+         * show edit form
          */
         else if(isset($this->action->php_admin_edit)) {
             echo "<h3 class=' uk-heading-divider'>". $this->go_back() . $this->get_name_singular() ."</h3>";
@@ -261,7 +275,7 @@ abstract class BaseBlueprint extends Resource {
 
             $this->url = app('base_url').$this->endpoints["show"];
 
-            $this->edit();
+            echo $this->edit();
         }
 
         /**
@@ -275,7 +289,7 @@ abstract class BaseBlueprint extends Resource {
             
             $this->url = app('base_url').$this->endpoints["show"];
         
-            $this->show();
+            echo $this->show();
         }
 
         /**
@@ -297,7 +311,7 @@ abstract class BaseBlueprint extends Resource {
         else if( isset($this->action->php_admin_delete_multiple)) {
             echo "<h3 class=' uk-heading-divider'>". $this->go_back() . $this->get_name_plurial() ."</h3>";
 
-            $this->validate(['selected_id'=>'No selected resources to delete']);
+            $this->validate(['selected_id'=>Translation::translate('no_selected_ressources')]);
 
             foreach ($this->data->selected_id as $id) {
                 $this->url = app('base_url').$this->endpoints["delete"];
@@ -305,18 +319,7 @@ abstract class BaseBlueprint extends Resource {
                 $this->delete(true);
             }
 
-            echo "
-            <div class='ui icon message success large'>
-                <i onclick='window.history.back();' class='close icon'></i>
-                <i class='thumbs up outline icon'></i>
-                <div class='content'>
-                    <div class='header'>
-                    Task done !
-                    </div>
-                    <div class='divider'></div>
-                    <p>Close this message to continue</p>
-                </div>
-            </div>";
+            Presenter::present('generics.success');
         }
 
         /**
@@ -335,7 +338,7 @@ abstract class BaseBlueprint extends Resource {
         else if( isset($this->action->php_admin_export)) {
             echo "<h3 class=' uk-heading-divider'>". $this->go_back() . $this->get_name_plurial() ."</h3>";
 
-            $this->validate(['selected_id'=>'No selected resources to export']);
+            $this->validate(['selected_id'=>Translation::translate('no_selected_ressources')]);
 
             $this->url = app('base_url').$this->endpoints["show"];
 
@@ -347,7 +350,7 @@ abstract class BaseBlueprint extends Resource {
          */
         else {
             echo "<h3 class=' uk-heading-divider'> {$this->get_name_plurial()}</h3>";
-            return $this->list();
+            echo $this->list();
         }
     }
 
@@ -394,14 +397,15 @@ abstract class BaseBlueprint extends Resource {
     }
 
     protected function list() {
-        ListGuesser::render($this, $this->data_fetched);
+        return ListGuesser::render($this, $this->data_fetched);
     }
 
     protected function create() {
         if(!$this->createable) {
-            Presenter::present('generics.unauthorised', []);
+            Presenter::present('generics.unauthorised');
+            exit();
         }
-        CreateGuesser::render($this);
+        return CreateGuesser::render($this);
     }
 
     protected function save(Array $data, $method = "POST") {
@@ -428,10 +432,11 @@ abstract class BaseBlueprint extends Resource {
 
     protected function edit() {
         if(!$this->editable) {
-            Presenter::present('generics.unauthorised', []);
+            Presenter::present('generics.unauthorised');
         }
+
         $this->url = app('base_url').$this->endpoints["show"];
-        EditGuesser::render($this, $this->action->uid);
+        return EditGuesser::render($this, $this->action->uid);
     }
 
     protected function update(Array $data, $method = "PUT") {
@@ -454,13 +459,13 @@ abstract class BaseBlueprint extends Resource {
 
     protected function show() {
         $this->url = app('base_url').$this->endpoints["show"];
-        ShowGuesser::render($this, $this->action->uid);
+        return ShowGuesser::render($this, $this->action->uid);
     }
 
     protected function delete(bool $verbose = false, $method = "DELETE") {
 
         if(!$this->deleteable) {
-            Presenter::present('generics.unauthorised', []);
+            Presenter::present('generics.unauthorised');
             exit();
         }
 
@@ -469,27 +474,15 @@ abstract class BaseBlueprint extends Resource {
 
         $this->api->callWith($this->url, $method);
 
+        if(!$verbose)
+            Presenter::present('generics.success');
 
-        // if(!$verbose) {
-        echo "
-        <div class='ui icon message success large'>
-            <i class='close icon'></i>
-            <i class='thumbs up outline icon'></i>
-            <div class='content'>
-                <div class='header'>
-                ". 200 ." - Success
-                </div>
-                <div class='divider'></div>
-                    <p>Deleted #{$this->action->uid}</p>
-                </div>
-            </div> ";
-            //<code>".json_encode($this->api->response())."</code></p>";
     }
 
     protected function export(array $selected_ids) {
 
         if(!$this->exportable) {
-            Presenter::present('generics.unauthorised', []);
+            Presenter::present('generics.unauthorised');
         }
 
 
@@ -533,6 +526,18 @@ abstract class BaseBlueprint extends Resource {
         return isset($this->paginate['data_field']);
     }
 
+    public function edit_form_modal($data) {
+        return EditGuesserModal::render($this, (Object) $data);
+    }
+
+    public function edit_form() {
+        return $this->edit();
+    }
+
+    public function create_form() {
+        return $this->create();
+    }
+
     /**
      * get the unique identify of the bluprint
      */
@@ -548,8 +553,8 @@ abstract class BaseBlueprint extends Resource {
             $req = new Request();
             if(!isset($req->$param) || empty($req->$param)) {
                 Presenter::present('generics.error', [
-                    'error_info'=>'Data missing',
-                    'error_code'=>500,
+                    'error_info'=>Translation::translate('data_missing'),
+                    'error_code'=>1782,
                     'error_description'=> $error_text,
                 ]);
             }
@@ -561,11 +566,11 @@ abstract class BaseBlueprint extends Resource {
     }
 
     private function get_name_singular() {
-        return $this->title['one'] ?? $this->model;
+        return $this->title['one'] ?  ucfirst($this->title['one']) : ucfirst($this->model);
     }
 
     private function get_name_plurial() {
-        return $this->title['many'] ?? $this->model;
+        return $this->title['many'] ? ucfirst($this->title['many']) : ucfirst($this->model);
     }
 }
 

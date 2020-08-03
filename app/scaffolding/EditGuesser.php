@@ -14,8 +14,6 @@ class EditGuesser {
 
     public static function render(BaseBlueprint $blueprint, $uid) {
 
-        $primary_color = app('primary_color');
-
         $url = preg_replace('/{id}/', $uid, $blueprint->url());
 
         $resource = Request::$request->php_admin_resource;
@@ -24,9 +22,6 @@ class EditGuesser {
         $api = new API();
         $api->header("Authorization", app('auth_type').' '.Auth::token());
         $response = $api->get($url)->response();
-
-        // var_dump($response);
-        // exit();
 
         if(is_array($response)) {
             exit("Multiple data send. Can't handle it");
@@ -110,13 +105,30 @@ class EditGuesser {
                             else
                                 $old_value = null;
 
-                            $elements .= "<div class='column'>";
+                            $elements .= "<div class='column' id='{$column->id}_container'>";
                                 $elements .= "<div class='ui form'>";
                                     $elements .= "<div class='field {$column->disabled}'>";
+
+                                        // image
+                                        $required_indicator = '';
+                                        if($column->required) {
+                                            $required_indicator = "<small class='uk-text-danger'>  (".Translation::translate('field required').")</small>";
+                                        }
+
+                                        $label  = "<label for='".$value."'>".$column->name.$required_indicator."</label>";
+                                        if($column->image) {
+
+                                            if(!preg_match("/(http(s)?:\/\/)?(www.)?.\w{2,6}/i", $old_value)) {
+                                                $old_value = preg_replace('/$\//', '', app('base_url')) .'/'. preg_replace('/^\//', '', $old_value);  
+                                            }
+
+                                            $label  = "<label for='".$value."' uk-lightbox>".$column->name.$required_indicator."<small> (<a href='$old_value'>". Translation::translate('click_to_preview') .")</a></small></label>";
+                                        }
                             
-                                        $elements .= "<label for='".$value."'>".$column->name."</label>";
-                                        $elements .= "<div class='ui input'>";
-                                        $elements .= "<input {$column->required} autocomplete='new-password' value=". '"' . $old_value . '"' ." 
+                                        // $elements .= "<label for='".$value."'>".$column->name."</label>";
+                                        $elements .= $label;
+                                        $elements .= "<div class='ui input small'>";
+                                        $elements .= "<input class='{$column->class}' id='{$column->id}' maxlength='{$column->length}' {$column->required} autocomplete='new-password' value=". '"' . $old_value . '"' ." 
                                         type='".$column->type."' id='".$value."' 
                                         name='".$column->variable."' 
                                         placeholder=". '"' . $column->name . '"' .">";
@@ -131,6 +143,7 @@ class EditGuesser {
                         $api->header("Authorization", app('auth_type').' '.Auth::token());
                         $api->callWith(app('base_url').$column->endpoint, $column->fetch_method);
                         $sub_response = $api->response();
+
 
                         if(count($sub_element) == 1) {
                             array_push($sub_element, $column->relation);
@@ -185,8 +198,8 @@ class EditGuesser {
 
                             $cell_value = $checkbox->render();
                         } else {
-                            
-                            $dropdown = new Dropdown($column->variable, $old_value, 'Select '.$column->name, $column->required);
+
+                            $dropdown = new Dropdown($column->variable, $old_value, $column->name, $column->required, $column->id, $column->class);
                             foreach ($sub_response as $single_object) {
                                 $current_level = $single_object;
                                 foreach ($sub_element as $level) {
@@ -195,14 +208,14 @@ class EditGuesser {
                                     }
                                 }
     
-                                $dropdown->define($current_level->$last_child, $current_level->$relation, $current_level->$option_image);
+                                $dropdown->define($current_level->$last_child, $current_level->$relation, $current_level->$option_image ?? null);
                             }
 
                             $cell_value = $dropdown->render();
                         }
 
                         
-                        $elements .= "<div class='column'>";
+                        $elements .= "<div class='column' id='{$column->id}_container'>";
                             $elements .= "<div class='ui form'>";
                                 $elements .= "<div class='field {$column->disabled}'>";
 
@@ -225,11 +238,68 @@ class EditGuesser {
                     }
 
 
+                    // has values defined and object (dropdown)
+                    if( ($column->type == 'object' and !empty($column->values)) and is_array($column->values)) {
+
+                        $dropdown = new Dropdown($column->variable, $old_value, $column->name, $column->required, $column->id, $column->class);
+                        foreach($column->values as $val => $label) {
+                            $dropdown->define($label, $val, $column->option_image);
+                        }
+
+                        $elements .= "<div class='column' id='{$column->id}_container'>";
+                            $elements .= "<div class='ui form'>";
+                                $elements .= "<div class='field {$column->disabled}'>";
+
+
+                                $required_indicator = '';
+                                if($column->required) {
+                                    $required_indicator = "<small class='uk-text-danger'>  (".Translation::translate('field required').")</small>";
+                                }
+
+                                $elements .= "<label for='".$value."'>".$column->name.$required_indicator."</label>";
+                                $elements .= "<div class='ui input'>";
+                                    $elements.= $dropdown->render();
+                                $elements .= "</div>";
+
+                                $elements .= "</div>";
+                            $elements .= "</div>";
+                        $elements .= "</div>";
+                        continue;
+                    }
+
+                    // has values defined and array (checkbox)
+                    if (($column->type == 'array' and !empty($column->values)) and is_array($column->values)) {
+                        $checkbox = new Checkbox($column->variable.'[]');
+                        foreach ($column->values as $val => $label) {
+                            $checkbox->define($label, $val);
+                        }
+
+                        $column->name = $sub_element[0];
+                        $column->name = str_replace('_',' ' ,ucfirst($column->name));
+
+                        $elements .= "<div class='column' id='{$column->id}_container'>";
+                            $elements .= "<div class='ui form'>";
+                                $elements .= "<div class='field {$column->disabled}'>";
+
+                                    $required_indicator = '';
+                                    if($column->required) {
+                                        $required_indicator = "<small class='uk-text-danger'>  (".Translation::translate('field required').")</small>";
+                                    }
+
+                                    $elements .= "<label for='".$value."'>".$column->name.$required_indicator."</label>";
+                                    $elements .= $checkbox->render();
+
+                                $elements .= "</div>";
+                            $elements .= "</div>";
+                        $elements .= "</div>";
+                        continue;
+                    }
+
                     // exit("HERE");
                     // is text
                     if($column->type == 'longtext') {
 
-                        $elements .= "<div class='column'>";
+                        $elements .= "<div class='column' id='{$column->id}_container'>";
                             $elements .= "<div class='ui form'>";
                                 $elements .= "<div class='field {$column->disabled}'>";
     
@@ -239,8 +309,8 @@ class EditGuesser {
                                     }
 
                                     $elements .= "<label for='".$value."'>".$column->name.$required_indicator."</label>";
-                                    $elements .= "<div class='ui input'>";
-                                        $elements .= "<textarea style='resize: vertical; height: 100px' 
+                                    $elements .= "<div class='ui input mini'>";
+                                        $elements .= "<textarea class='{$column->class}' id='{$column->id}' maxlength='{$column->length}' style='resize: vertical; height: 100px' 
                                         type='".$column->type."' id='".$value."' 
                                         name='".$column->variable."' 
                                         placeholder=". '"' .$column->name . '"' . ">{$old_value}</textarea>";
@@ -262,9 +332,9 @@ class EditGuesser {
                     $label  = "<label for='".$value."'>".$column->name.$required_indicator."</label>";
                     $image = '';
                     if($column->image) {
-                        $form = $column->image;
-                        $form = in_array($form, ['rounded', 'circular']) ? $form : 'rounded';  
-                        $old_value = preg_replace('/$\//', '', app('origin')) .'/'. preg_replace('/^\//', '', $old_value);  
+                        if(!preg_match("/(http(s)?:\/\/)?(www.)?.\w{2,6}/i", $old_value)) {
+                            $old_value = preg_replace('/$\//', '', app('base_url')) .'/'. preg_replace('/^\//', '', $old_value);  
+                        }
                         $label  = "<label for='".$value."' uk-lightbox>".$column->name.$required_indicator."<small> (<a href='$old_value'>". Translation::translate('click_to_preview') .")</a></small></label>";
                     }
 
@@ -273,13 +343,13 @@ class EditGuesser {
                     }
 
                     
-                    $elements .= "<div class='column'>";
+                    $elements .= "<div class='column' id='{$column->id}_container'>";
                         $elements .= "<div class='ui form'>";
                             $elements .= "<div class='field {$column->disabled}'>";
                     
                                 $elements .= $label; //"<label for='".$value."' uk-lightbox><a href='$old_value'>".$column->name."</a></label>";
-                                $elements .= "<div class='ui input'>";
-                                $elements .= "<input {$column->required} autocomplete='new-password' value=". '"' . $old_value . '"' ." 
+                                $elements .= "<div class='ui input small'>";
+                                $elements .= "<input class='{$column->class}' id='{$column->id}' maxlength='{$column->length}' {$column->required} autocomplete='new-password' value=". '"' . $old_value . '"' ." 
                                 type='".$column->type."' id='".$value."' 
                                 name='".$column->variable."' 
                                 placeholder=". '"' . $column->name . '"' .">";
@@ -291,14 +361,14 @@ class EditGuesser {
 
             $elements .= "</div>";
 
-            $elements .= "<div class='uk-margin'>";
-                $elements .= "<button class='ui button $primary_color' type='submit'><i class='ui icon save'></i>". Translation::translate("update") ."</button>";
+            $elements .= "<div class='uk-margin uk-text-right'>";
+                $elements .= "<button class='ui button yellow small' type='submit'><i class='ui icon check'></i>". Translation::translate("update") ."</button>";
             $elements .= "</div>";
 
 
         $elements .= "</form>";
 
-        echo $elements;
+        return $elements;
 
     }
 }

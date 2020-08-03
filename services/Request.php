@@ -16,15 +16,9 @@ class Request {
             'php_admin_resource'=>null,
             'uid'=>null,
         ];
-
-        // if(isset($path[0])) {
-        //     $request['php_admin_resource'] = $path[0];
-        // }
-        
         
         if(preg_match("/^\/\w+/", $req_path)) {
-            $request['php_admin_resource'] = $path[0];
-            // $request['php_admin_create'] = '';
+            $request['php_admin_resource'] = explode('?', $path[0])[0];
         }
 
         if(preg_match("/^\/\w+\/create/", $req_path)) {
@@ -77,6 +71,10 @@ class Request {
         }
     }
 
+}
+
+function request(String $key) {
+    return Request::$request->$key ?? null;
 }
 
 ?>

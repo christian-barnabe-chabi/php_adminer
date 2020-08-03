@@ -13,14 +13,26 @@ class Router {
         }
         else {
             Router::redirect(app('entrypoint'));
-            // Resource::(app('entrypoint'));
-            // Presenter::present('generics.global_error', ["error_info"=>"Failed", "error_code"=>404, "error_description"=>"PAGE NOT FOUND"]);
         }
     }
 
     public static function redirect(string $name) {
         $url = preg_replace("/^(\/)*/i", "", $name);
-        echo "<meta http-equiv = 'refresh' content = '0; url = /{$url}' />";
+        header("location:$url");
+        // echo "<meta http-equiv = 'refresh' content = '0; url = /{$url}' />";
+        exit();
+    }
+
+    public static function route() {
+        return $_SERVER['REQUEST_URI'];
+    }
+
+    public static function back() {
+        if($_SERVER['HTTP_REFERER']) {
+            header("location:{$_SERVER['HTTP_REFERER']}");
+            // echo "<meta http-equiv = 'refresh' content = '0; url = {$_SERVER['HTTP_REFERER']}' />";
+            exit();
+        }
     }
 }
 

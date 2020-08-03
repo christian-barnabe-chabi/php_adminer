@@ -92,61 +92,9 @@ $(document).ready(() => {
         $('table:not(.no-sort)').tablesort();
     }
 
-    // $("#search_value").on("keyup", (e)=>{
-    //     if(e.which == 13) {
-    //         e.preventDefault();
-    //     }
-    //     search_in_table();
-    // });
-
-    function search_in_table() {
-
-        let search_in = $('#search_in').val();
-
-        if($("#search_value").val().trim().length === 0) {
-            $('#table_of_resource tbody tr').show(500);
-            return;
-        }
-        if(search_in < 1 || $("#search_value").val().trim().length === 0) {
-            return;
-        }
-
-        let thead_th = $('#table_of_resource th');
-
-        let search_in_index = -1;
-        for (let i = 0; i < thead_th.length; i++) {
-            const element = $(thead_th[i]).text();
-            if(element.toLowerCase() == search_in.toLowerCase()) {
-                search_in_index = i;
-            }
-        }
-
-        if(search_in_index != -1) {
-            let tbody_tr = $('#table_of_resource tbody tr');
-            for (const tr in tbody_tr) {
-                if (tbody_tr.hasOwnProperty(tr)) {
-                    const element = tbody_tr[tr];
-                    let tr_td = $(element).children('td');
-                    
-                    let td = tr_td[search_in_index];
-
-                    let td_value = $(td).text().toLowerCase().trim();
-                    let search_value = $("#search_value").val().toLowerCase().trim();
-
-                    // regex
-                    var regex = new RegExp('('+search_value+')');
-                    if(!regex.test(td_value)) {
-                        if($(element).is('tr'))
-                            $(element).hide(500);
-                    } else {
-                        if($(element).is('tr'))
-                            $(element).show(500);
-                    }
-                }
-            }
-
-        }
-    }
+    $('#selected_resource').on('click', (event)=>{
+        event.preventDefault();
+    })
 
     function auto_fix() {
         document_height = $(document).height();
@@ -164,9 +112,12 @@ $(document).ready(() => {
     }
 
     var x = $('.menu a.active.item');
-    var top = x.position().top;
-    x.offsetParent().animate({
-        scrollTop: top+'px'
-    });
+
+    if(x.length != 0) {
+        var top = x.position().top;
+        x.offsetParent().animate({
+            scrollTop: top+'px'
+        });
+    }
 
 })

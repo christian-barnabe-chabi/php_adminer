@@ -18,6 +18,10 @@
     src : url('/assets/fonts/Montserrat-Regular.ttf');
 }
 
+.ui.menu.fixed .item:first-child, .ui.menu.fixed .item:last-child {
+    border-radius: 4px !important;
+}
+
 html, body {
     height: 100%;
     min-width: 1126px !important;
@@ -47,8 +51,23 @@ html, body {
     overflow-y: scroll !important;
 }
 
+#side-menu {
+    z-index: 99;
+}
+
 #side-menu, #main-container {
     display: none;
+}
+
+#side-menu a.active.item {
+    background-image: url(/assets/img/bg.jpg);
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-blend-mode: multiply;
+    /* background-color: rgba(250, 75, 44, 0.87) !important; */
+    /* background-color: rgba(255, 98, 71, 0.87) !important; */
+    box-shadow: -6px 6px 16px -10px black, 0px 0px 6px -6px black;
+    color: white !important;
 }
 
 th {

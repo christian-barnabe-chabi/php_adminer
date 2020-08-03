@@ -1,9 +1,16 @@
 <?php 
+
+use Services\API;
+use Services\Auth;
+use Services\Resource;
+use Services\Translation;
+
     $primary_color = app('primary_color');
     $inverted = app('colorful') ? 'inverted' : '';
+    $bg_white = empty($inverted)  ? 'background: white' : '';
 ?>
 
-<div class="ui <?= $inverted ?> <?= $primary_color ?> menu fixed top grid desktop-only" id="topNavbar" style="z-index: 100; border-radius: 0px !important;">
+<div class="ui <?= $inverted ?> <?= $primary_color ?> menu fixed top grid desktop-only" id="topNavbar" style="z-index: 100; border-radius: 0px !important; <?= $bg_white ?>">
     <nav class="ui left menu secondary uk-padding-small" uk-grid>
         <!-- brand -->
         <div class="item" style="margin: 0px; padding: 0px; margin-right: 10px;">
@@ -23,17 +30,20 @@
                 <?php endif; ?>
             </a>
         </div>
-        
     </nav>
+
 
     <nav class="ui right menu secondary uk-padding-small">
 
-<?php
+        <span class="item ui dropdown">
+            <?= ucfirst(Translation::translate('_mode')) ?> : <?= ucfirst(Translation::translate(app('theme', 'light'))) ?>
+            <div class="ui menu">
+                <a href="/mode?theme=night" class="item"><?= ucfirst( Translation::translate('night')) ?></a>
+                <a href="/mode?theme=light" class="item"><?= ucfirst( Translation::translate('light')) ?></a>
+            </div>
+        </span>
 
-use Services\API;
-use Services\Auth;
-use Services\Resource;
-use Services\Translation;
+<?php
 
 if(!empty(Auth::user())):
             $avatar = "/assets/img/profile_user.jpg";
@@ -42,15 +52,9 @@ if(!empty(Auth::user())):
             }
             
         ?>
-
-            <!-- notification -->
-            <?php
-                // get notfication count to $notifications_count
-                $notifications_count = 4;
-            ?>
             <a href="<?= Resource::link('notification') ?>" class="item ui floating tiny button icon circular" style="margin: 0px;">
                 <i class="ui bell outline large icon"></i>
-                <span class="ui floating circular basic mini label <?= $primary_color ?>"><?= $notifications_count ?></span>
+                <span class="ui floating circular basic mini label <?= $primary_color ?>">0</span>
             </a>
 
 
@@ -59,33 +63,25 @@ if(!empty(Auth::user())):
             <div class="item" style="margin-top: 0px; margin-bottom: 0px; padding-top: 0px; padding-bottom: 0px;">
                 <div class="ui pointing dropdown top right" style="margin: 0px; padding: 0px;">
                     <div class="ui">
-                        <img class="ui avatar image" src="<?= $avatar ?>" style="width: 45px; height: 45px;"> <?= ucwords(Auth::user()->username) ?>
+                        <img class="ui avatar image" src="<?= $avatar ?>" style="width: 45px; height: 45px;"> <?= ucwords(Auth::user()->name ?? "User") ?>
                         <i class="dropdown icon"></i>
                     </div>
                     <div class="ui secondary vertical menu">
                         <div class="item" style="background: transparent !important;">
                             <div class="ui one column grid">
                                 <div class="column uk-text-center" style="padding: 2px;">
-                                    <img src="<?= Auth::user()->avatar ?>" alt="" srcset="" class='ui tiny avatar image' style="width: 80px; height: 80px;">
+                                    <img src="<?= $avatar ?>" alt="" srcset="" class='ui tiny avatar image' style="width: 80px; height: 80px;">
                                 </div>
                                 <div class='column uk-text-center'>
-                                    <span><?= ucwords(Auth::user()->username) ?></span>
+                                    <span><?= ucwords(Auth::user()->name ?? 'User') ?></span>
                                     <br>
-                                    <small class='ui subtitle'><?= ucwords(Auth::user()->email) ?></small>
+                                    <small class='ui subtitle'><?= Auth::user()->email ?? 'user@example.com' ?></small>
                                     <br>
-                                    <small class='ui label tiny subtitle'><?= ucwords(Auth::user()->role->type) ?></small>
+                                    <small class='ui label tiny subtitle'><?= Auth::user()->role ?? 'admin account' ?></small>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="divider"></div>
-                        <!-- profile -->
-                        <a href='/user/show/<?= Auth::user()->id ?>' class="item">
-                            <i class="ui address book outline icon"></i> Mon compte
-                        </a>
-                        <a href='<?= Resource::link('profile') ?>' class="item">
-                            <i class="ui user outline icon"></i> Profile
-                        </a>
                         <div class="divider"></div>
                         
                         <!-- logout -->
@@ -102,10 +98,8 @@ if(!empty(Auth::user())):
         ?>
 
             <!-- if not loged in -->
-            <div class="item">
-                <span class="">
-                    <i class="ui user icon"></i> Guest
-                </span>
+            <div class="ui">
+                <img class="ui avatar image" src="/assets/img/profile_user.jpg" style="width: 45px; height: 45px;"> <?= Translation::translate('guest') ?>
             </div>
         <?php 
                 endif; 

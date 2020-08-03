@@ -5,6 +5,7 @@ namespace App\Scaffolding;
 use App\Resources\BaseBlueprint;
 use Services\DateFormater;
 use Services\Request;
+use Services\Resource;
 use Services\Translation;
 
 use function Lib\str_cut;
@@ -16,8 +17,6 @@ class ListGuesser {
     private static $table_columns;
 
     public static function render(BaseBlueprint $blueprint, $objects) {
-
-        $sample_length = 100;
 
         if(empty($blueprint->get_columns())) return null;
 
@@ -31,6 +30,8 @@ class ListGuesser {
         $route = Request::$request->php_admin_resource;
 
         $search_in = '';
+
+        $class = get_class(self::$blueprint);
 
         // for search dropdown
         foreach (self::$table_columns as $key => $value) {
@@ -58,25 +59,63 @@ class ListGuesser {
 
         // add create button if needed
         $create_element = "";
+        $create_modal_form = "";
         if(self::$blueprint->createable()) {
             $create_element = "
-                <a value='create' class='ui button mini blue basic' href='/{$route}/create'>
+                <span onclick=\"$('#create_form').modal({
+                    transition: 'slide down',
+                }).modal('show')\"
+                
+                class='ui button mini blue basic' href='/{$route}/create'>
                     <i class=' ui icon pencil'></i>
                     ". Translation::translate("create") ."
-                </a>
+                </span>
             ";
+
+            $create_modal_form = "<div class='ui modal' id='create_form'>";
+                $create_modal_form .= "<div class='header'>";
+                    $create_modal_form .= Translation::translate('create');
+                $create_modal_form .= "</div>";
+    
+                $create_modal_form .= "<div class='content scrolling'>";
+                    $create_modal_form .= Resource::call($class, [], 'create_form');
+                $create_modal_form .= "</div>";
+            $create_modal_form .= "</div>";
         }
+
 
         // delete create button if needed
         $delete_element = "";
+        $delete_modal_confirm = "";
         if(self::$blueprint->deleteable()) {
             $delete_element = "
-                <button name='php_admin_delete_multiple' value='' class='ui button mini orange basic' >
+                <span onclick=\"
+                    $('#confirm_delete').modal({
+                        transition: 'fly down',
+                    }).modal('show')\"
+                class='ui button mini orange basic' >
                 <i class=' ui icon trash'></i>
                     ". Translation::translate("delete") ."
-                </button>
+                </span>
+
+                <button id='multiple_delete_button' name='php_admin_delete_multiple' style='display: none'>
+                <i class=' ui icon trash'></i>
+                    ". Translation::translate("delete") ."
+                </buttom>
             ";
+            
+            $delete_modal_confirm = "<div class='ui modal mini' id='confirm_delete'>";
+                $delete_modal_confirm .= "<div class='header'>";
+                    $delete_modal_confirm .= Translation::translate('are_you_sure_to_delete');
+                $delete_modal_confirm .= "</div>";
+    
+                $delete_modal_confirm .= "<div class='actions'>";
+                    $delete_modal_confirm .= "<button onclick=\"$('#multiple_delete_button').trigger('click')\" class='ui button small orange'>". Translation::translate('yes') ."</button>";
+                    $delete_modal_confirm .= "<button class='ui button small olive deny'>". Translation::translate('no') ."</button>";
+                $delete_modal_confirm .= "</div>";
+            $delete_modal_confirm .= "</div>";
         }
+
 
         // export create button if needed
         $export_element = "";
@@ -90,9 +129,10 @@ class ListGuesser {
         }
 
 
+        $modal_forms = "";
         $elements = "<div class=''>";
             // we need form for checkboxes
-            $elements .= "<form class='' action='' method='POST'>";
+            $elements .= "<form class='' id='list_form' action='' method='POST'>";
 
             // search and delete and export
             $elements .= "
@@ -102,12 +142,12 @@ class ListGuesser {
                             <div class='ui left labeled input mini'>
                             <div class='ui dropdown search selection label'>
                                 <input type='hidden' placeholder='Search' id='search_in'>
-                                <div class='text'>Search in</div>
+                                <div class='text'>". Translation::translate('search in') ."</div>
                                 <div class='menu'>
                                     {$search_in}
                                 </div>
                             </div>
-                                <input type='text' role='text' placeholder='Search' id='search_value'>
+                                <input type='text' role='text' placeholder='". Translation::translate('search in') ."' id='search_value'>
                             </div>
                         </div>
                         <div class='column uk-text-right'>
@@ -129,7 +169,9 @@ class ListGuesser {
                         $elements .= "<tr>";
 
                         // check all
-                        $elements .= "<th class='no-sort uk-text-center collapsing'><input type='checkbox' class='uk-checkbox' id='check_all_objcts'></th>";
+                        if($blueprint->exportable()) {
+                            $elements .= "<th class='no-sort uk-text-center collapsing'><input type='checkbox' class='uk-checkbox' id='check_all_objcts'></th>";
+                        }
 
                         // add table heads
                         foreach(self::$table_columns as $table_head) {
@@ -167,11 +209,37 @@ class ListGuesser {
                         foreach(self::$objects as $obj) {
                             $uid_field = $blueprint->uid_field();
                             $uid = $obj->$uid_field;
+                            Request::$request->uid = $uid;
+                            $row_data_id = substr(md5($uid), 0, 10);
+                            
+                            $modal_forms .= "<div class='ui modal' id='$row_data_id'>";
+                                $modal_forms .= "<div class='header'>";
+                                    $modal_forms .= Translation::translate('update');
+                                $modal_forms .= "</div>";
+
+                                $modal_forms .= "<div class='content scrolling'>";
+                                    $modal_forms .= Resource::call($class, (Array)$obj, 'edit_form_modal');
+                                $modal_forms .= "</div>";
+                            $modal_forms .= "</div>";
+
+                            $delete_modal_confirm .= "<div class='ui modal mini' id='confirm_delete_$row_data_id'>";
+                                $delete_modal_confirm .= "<div class='header'>";
+                                    $delete_modal_confirm .= Translation::translate('are_you_sure_to_delete');
+                                $delete_modal_confirm .= "</div>";
+
+                                $delete_modal_confirm .= "<form method='POST' class='actions' action='/{$route}/delete/{$uid}'>";
+                                    $delete_modal_confirm .= "<button onclick=\"$('#multiple_delete_button').trigger('click')\" class='ui button small orange'>". Translation::translate('yes') ."</button>";
+                                    $delete_modal_confirm .= "<button type='button' class='ui button small olive deny'>". Translation::translate('no') ."</button>";
+                                $delete_modal_confirm .= "</form>";
+                            $delete_modal_confirm .= "</div>";
+
                             $elements .= "<tr style='cursor: pointer;'>";
 
 
                             // checkboxes
-                            $elements .= "<td class='collapsing uk-text-center'><input type='checkbox' name='selected_id[]' value='{$uid}' class=' uk-checkbox selected_ids'></td>";
+                            if($blueprint->exportable()) {
+                                $elements .= "<td class='collapsing uk-text-center'><input type='checkbox' name='selected_id[]' value='{$uid}' class=' uk-checkbox selected_ids'></td>";
+                            }
 
                             
                             // for each column in columns
@@ -335,10 +403,18 @@ class ListGuesser {
                                 $elements .= "<a href='/{$route}/show/{$uid}' class='uk-link-text uk-link-reset'><i class='ui icon eye gree'></i></a>";
 
                                 if($blueprint->editable())
-                                    $elements .= "<a href='/{$route}/edit/{$uid}' class='uk-link-text uk-link-reset'><i class='ui icon edit blue'></i></a>";
+                                    $elements .= "<span onclick=\"
+                                    $('#$row_data_id').modal({
+                                        transition: 'drop',
+                                    }).modal('show')\"
+                                    href='/{$route}/edit/{$uid}' class='uk-link-text uk-link-reset'><i class='ui icon edit blue'></i></span>";
 
                                 if($blueprint->deleteable())
-                                    $elements .= "<a href='/{$route}/delete/{$uid}' class='uk-link-text uk-link-reset'><i class='ui icon trash orange'></i></a>";
+                                    $elements .= "<span onclick=\"
+                                        $('#confirm_delete_$row_data_id').modal({
+                                            transition: 'fly left',
+                                        }).modal('show')\"
+                                    class='uk-link-text uk-link-reset'><i class='ui icon trash orange'></i></span>";
                             $elements .= "</td>";
 
                             $elements .= "</tr>";
@@ -359,7 +435,7 @@ class ListGuesser {
                     <div class="item ui mini transparent input" style="padding: 0px !important; margin: 0px !important;">
                         <input type="number" id="current_page_field" value="1" style="text-align: center; font-size: 1.6em; width: 60px;">
                     </div>
-                    <a href="" class="item">/</a>
+                    <span href="" class="item">/</span>
                     <div class="item ui mini transparent input" style="padding: 0px !important; margin: 0px !important;">
                         <input type="text" disabled id="last_page_field" value="" style="text-align: center; font-size: 1.6em; width: 60px;">
                     </div>
@@ -453,7 +529,10 @@ class ListGuesser {
 
         $elements .= "</div>";
 
-        echo $elements;
+        $elements .= $modal_forms;
+        $elements .= $create_modal_form;
+        $elements .= $delete_modal_confirm;
+        return $elements;
     }
 
     private static function callback($column, $value) {
@@ -471,6 +550,7 @@ class ListGuesser {
     }
 
     private static function build_cell(ColumnAttribute $column, $cell_value, $cell_link = null, $tooltip = null, $labeled = null) {
+
         $elements = "";
         if(preg_match('/\w*\.(jpeg|png|bmp|gif|jpg|ico|tiff)/', $cell_value)) {
             $form = '';       
@@ -514,6 +594,11 @@ class ListGuesser {
 
             return $elements;
         }
+
+        if(preg_match("/(\d\d:\d\d):\d\d/", $cell_value, $matches)) {
+            $cell_value = $matches[1];
+        }
+
 
         $elements .=
         "<td {$cell_link} class=''>

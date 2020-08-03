@@ -28,7 +28,6 @@ class ShowGuesser {
         $api = new API();
         $api->header("Authorization", app('auth_type').' '.Auth::token());
         $response = $api->get($url)->response();
-
         
         if(is_array($response)) {
             exit("Multiple data send. Can't handle it");
@@ -53,7 +52,7 @@ class ShowGuesser {
             }
 
             // array // widget bottom
-            if(is_array($value) || $column->type == 'array' && !isset($column->values)) {
+            if(is_array($value)) {
                 if(empty($value))
                     continue;
 
@@ -152,9 +151,7 @@ class ShowGuesser {
             // object
             // if(is_object($value) || $column->type == 'object' && !isset($column->values) && !is_string($value)) {
             $widget_content = "";
-            if(is_object($value) || $column->type == 'object' && !isset($column->values)) {
-                if(empty($value))
-                    continue;
+            if(is_object($value)) {
                     
                 
                 $_key = Translation::translate($key);
@@ -168,8 +165,9 @@ class ShowGuesser {
                 // can still comment this block // is defined as object but value is a string
                 if(!is_array($value) && !is_object($value)) {
 
-                    if($callback_return = self::callback($key, $sub_value)) {
-                        $sub_key = Translation::translate($sub_key);
+                    if($callback_return = self::callback($key, $value)) {
+
+                        $sub_key = Translation::translate($key);
                         $sub_key = ucfirst(str_replace('_',' ', $sub_key));
 
                         $sub_body .= "<tr>";
@@ -326,24 +324,61 @@ class ShowGuesser {
 
         // delete create button if needed
         $delete_element = "";
+        $delete_modal_confirm = "";
         if($blueprint->deleteable()) {
             $delete_element = "
-                <a href='/{$resource}/desactivate/{$uid}' value='delete' class='ui button mini orange basic' >
+                <span 
+                    onclick=\"
+                        $('#confirm_delete').modal({
+                            transition: 'fly down',
+                        }).modal('show')\"
+                    
+                    class='ui button mini orange basic' >
                     <i class=' ui icon trash'></i>
                     ". Translation::translate("delete") ."
-                </a>
+                </span>
             ";
+
+            $delete_modal_confirm = "<div class='ui modal mini' id='confirm_delete'>";
+                $delete_modal_confirm .= "<div class='header'>";
+                    $delete_modal_confirm .= Translation::translate('are_you_sure_to_delete');
+                $delete_modal_confirm .= "</div>";
+    
+                $delete_modal_confirm .= "<form method='POST' class='actions' action='/{$resource}/delete/{$uid}'>";
+                    $delete_modal_confirm .= "<button type='submit' class='ui button small orange'>". Translation::translate('yes') ."</button>";
+                    $delete_modal_confirm .= "<button type='button' class='ui button small olive deny'>". Translation::translate('no') ."</button>";
+                $delete_modal_confirm .= "</form>";
+            $delete_modal_confirm .= "</div>";
         }
+
 
         // edit create button if needed
         $edit_element = "";
+        $modal_form = "";
         if($blueprint->editable()) {
+            $modal_data_id = substr(md5($uid), 0, 10);
             $edit_element = "
-                <a href='/{$resource}/edit/{$uid}' value='export' class='ui button mini blue basic' >
+                <span onclick=\"
+                    $('#$modal_data_id').modal({
+                        transition: 'drop',
+                    }).modal('show')\"
+                href='/{$resource}/edit/{$uid}' class='ui button mini blue basic' >
                     <i class=' ui icon pencil'></i>
                     ". Translation::translate("edit") ."
-                </a>
+                </span>
             ";
+
+            // edit form for update
+            $class = get_class(self::$blueprint);
+            $modal_form = "<div class='ui modal' id='$modal_data_id'>";
+                $modal_form .= "<div class='header'>";
+                    $modal_form .= Translation::translate('update');
+                $modal_form .= "</div>";
+
+                $modal_form .= "<div class='content scrolling'>";
+                    $modal_form .= Resource::call($class, (Array)$response, 'edit_form_modal');
+                $modal_form .= "</div>";
+            $modal_form .= "</div>";
         }
 
         // export create button if needed
@@ -351,8 +386,8 @@ class ShowGuesser {
         if($blueprint->exportable()) {
             $export_element = "
                 <form action='/{$resource}/export/' method='POST' class='uk-display-inline'>
-                    <button name='selected_id[]' value={$uid}' type=''submit class='ui button mini teal basic' >
-                        <i class=' ui icon save'></i>
+                    <button name='selected_id[]' value='{$uid}' type='submit' class='ui button mini teal basic' >
+                        <i class='ui icon save'></i>
                         ". Translation::translate("export") ."
                     </button>
                 </form>
@@ -383,11 +418,13 @@ class ShowGuesser {
 
         
         // widget_top
-        $element .= "<div class='ui one column grid'>";
-            $element .= "<div class='column'>";
-                $element .= $widgets_top;
+        if(strlen($widgets_top)) {
+            $element .= "<div class='ui one column grid'>";
+                $element .= "<div class='column'>";
+                    $element .= $widgets_top;
+                $element .= "</div>";
             $element .= "</div>";
-        $element .= "</div>";
+        }
 
         $element .= "<div class='ui two column grid'>";
 
@@ -413,7 +450,10 @@ class ShowGuesser {
             $element .= "</div>";
         $element .= "</div>";
 
-        echo $element;
+        // echo $element;
+        $element .= $modal_form;
+        $element .= $delete_modal_confirm;
+        return $element;
     }
 
     private static function make_table($head, $body, string $max_height = 'auto', $single_line = true) {
@@ -491,6 +531,10 @@ class ShowGuesser {
             </td>";
 
             return $elements;
+        }
+
+        if(preg_match("/(\d\d:\d\d):\d\d/", $cell_value, $matches)) {
+            $cell_value = $matches[1];
         }
 
         $elements .=

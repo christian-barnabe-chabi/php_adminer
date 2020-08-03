@@ -12,22 +12,33 @@ class ResourceScaffold {
 
         $match = explode('/', $href);
         $active = self::match_menu($match[0]);
+        $class = $active ? ' active ' : '';
+        $secondary_color = app('secondary_color', 'rgba(0, 172, 29, 0.979)');
 
-        self::$elements .= "
-        <a class='{$active} item' href='/$href'>
-            <span>
-                <i class='ui {$icon} icon'></i>
-                {$name}
-            </span>
-        </a>";
+        if($active)
+            self::$elements .= "
+            <a class='{$class} item' style='background-color: $secondary_color !important' href='/$href'>
+                <span>
+                    <i class='ui {$icon} icon'></i>
+                    {$name}
+                </span>
+            </a>";
+        else
+            self::$elements .= "
+            <a class='{$class} item' href='/$href'>
+                <span>
+                    <i class='ui {$icon} icon'></i>
+                    {$name}
+                </span>
+            </a>";
     }
 
     public static function render() {
         $primary_color = app('primary_color');
         $inverted = app('colorful') ? 'inverted segment' : '';
-        $bg_white = empty($inverted)  ? 'background: whit' : '';
+        $bg_white = empty($inverted)  ? 'background: white' : '';
         echo"
-            <div class='ui secondary  {$primary_color} {$inverted} vertical menu fixed' id='side-menu' style='overflow: auto; {$bg_white}'>".
+            <div class='ui secondary segment {$primary_color} {$inverted} vertical menu fixed' id='side-menu' style='overflow: auto; {$bg_white}; padding: 5px 5px'>".
 
                 self::$elements
 
@@ -35,12 +46,12 @@ class ResourceScaffold {
         ";
     }
 
-    private static function match_menu($name_to_match) : String {
+    private static function match_menu($name_to_match) : bool {
         if(isset(Request::$request->php_admin_resource)) {
-            return preg_match("/^".$name_to_match."$/i", Request::$request->php_admin_resource) ? " active " : "";
+            return preg_match("/^".$name_to_match."$/i", Request::$request->php_admin_resource) ? true : false;
         }
 
-        return '';
+        return false;
     }
 
     public static function divider($category = null, $icon = null) {

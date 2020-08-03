@@ -43,7 +43,6 @@
 ```json
 {
     "base_url" : "http://chrisserver.me:8000/api",
-    "origin" : "http://chrisserver.me:8000",
     "entrypoint" : "dashboard",
     "primary_color" : "green",
     "colorful" : true,

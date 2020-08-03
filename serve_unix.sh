@@ -1,1 +1,1 @@
-php adminer serve --host=69.164.220.103
+php adminer serve --host=45.79.221.17

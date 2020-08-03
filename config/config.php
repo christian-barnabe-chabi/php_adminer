@@ -2,7 +2,7 @@
 
 use Services\Presenter;
 
-function app($key) {
+function app($key, $default = null) {
 
     if(!isset($_SESSION['ENV'])) {
 
@@ -42,12 +42,16 @@ function app($key) {
         ];
 
         if($env == null) {
-            Presenter::present('generics.top_error', []);
+            Presenter::present('generics.error', [
+                'error_code' => 1472,
+                'error_info' => 'Configuration',
+                'error_description' => "Configuration error. It seems like the <code>.env.json</code> file is not well formated",
+            ]);
             exit('env error');
         }
 
         if(!isset($env['primary_color']) || !in_array(trim($env['primary_color']), $colors )) {
-            $env['primary_color'] = 'blue';
+            $env['primary_color'] = 'red';
         }
 
         if(!isset($env['lang'])) {
@@ -61,7 +65,7 @@ function app($key) {
         $_SESSION['ENV'] = $env;
     }
     
-    return isset($_SESSION['ENV'][$key] ) ? $_SESSION['ENV'][$key] : null;
+    return $_SESSION['ENV'][$key] ?? $default;
 
 }
 

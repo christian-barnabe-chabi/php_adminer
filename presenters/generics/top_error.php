@@ -21,37 +21,39 @@
 
 <?php
 
-use Services\Translation;
+if(!isset($data)) $data = [];
 
-    echo "<div class='ui container fluid'>
-
-    
-    <div class='uk-position-relative uk-padding-small' id='main-container'>";
-    
-    
-    if(!isset($data)) $data = [];
-    
-    if(!key_exists('error_info', $data)) $data['error_info'] = 'Failure';
+    if(!key_exists('error_info', $data)) $data['error_info'] = "Failure" ;
     if(!key_exists('error_code', $data)) $data['error_code'] = "100";
     if(!key_exists('error_description', $data)) $data['error_description'] = "";
-    
-    echo "
-    <div class='ui icon message orange large'>
-        <i onclick='window.history.back()' class='close icon'></i>
-        <i class='thumbs down outline icon'></i>
-        <div class='content'>
-            <div class='header'>
-            Error  ". $data['error_code'] ." - ". $data['error_info'] ."
-            </div>
-            <div class='divider'></div>
-            <p>". $data['error_description'] ."</p>
-        </div>
-    </div>";
-    
-    echo "
-    </div>
-    ";
 
-    exit();
-
+    try {
+        $error_description = json_decode($data['error_description']);
+        $error_message = $error_description->message ?? $data['error_description'];
+    } catch (\Throwable $th) {
+        $error_message = "Failure";
+    }
 ?>
+
+<div class="ui modal compact mini error">
+    <div class="header">
+         <?= 'Error '. $data['error_code'] .' - '. $data['error_info'] ?>
+    </div>
+    <div class="content">
+        <?= $error_message ?>
+    </div>
+    <div class="actions">
+        <button onclick="$('.ui.error.modal').modal('hide');" class="ui mini yellow button"> Close </button>
+        <!-- <button onclick="$('.ui.error.modal').modal('hide')" class="ui mini yellow button"> Cancel </button> -->
+    </div>
+</div>
+
+<script>
+    $('.ui.error.modal').modal({
+        detachable: true,
+        closable: false,
+        transition: 'horizontal flip',
+    }).modal('show');
+</script>
+
+<?php  exit(); ?>

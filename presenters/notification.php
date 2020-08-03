@@ -1,6 +1,7 @@
 <?php
 use Services\Auth;
 use Services\DateFormater;
+use Services\Translation;
 
 ?>
 
@@ -22,7 +23,7 @@ use Services\DateFormater;
         <div class="footer">
             <form action="" method="post">
                 <input type="hidden" name="mark_as_read" value="<?= $notification->id ?>">
-                <input type="submit" value="Mark as read" class='uk-button-link uk-button'>
+                <input type="submit" value="<?= Translation::translate('mark as read') ?>" class='uk-button-link uk-button'>
             </form>
             <!-- <a href="#" onclick="" class='uk-link-reset uk-text-blue'><i class="ui open envelope outline icon"></i> Marquer comme lue</a> -->
         </div>

@@ -7,11 +7,11 @@ use Services\Translation;
 class Checkbox {
     private $element;
     private $name;
-    public function __construct($name, $default = 'Select ...')
+    public function __construct($name, $default = 'Select ...', $id = '', $class = '')
     {
         $this->name = $name;
         $this->element = "
-            <select name='{$name}' multiple='' class='ui fluid dropdown search'>
+            <select name='{$name}' multiple='' class='ui fluid dropdown search {$class}' id='{$id}'>
                     <option value=''>$default</option>";
     }
 

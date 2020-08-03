@@ -10,6 +10,7 @@ class API {
     private $ch;
     private $header;
     private $response;
+    private $method;
     public function __construct()
     {
 
@@ -39,11 +40,12 @@ class API {
 
     private function call() {
         $url = $this->url;
-
+        
         if(empty($this->url)) {
-            Presenter::present("generics.global_error", [
-                "error_info" => "Failed - API",
-                "error_code" => 000,
+            Presenter::present("generics.error", [
+                "error_info" => "API",
+                "error_code" => -1,
+                "url" => $this->method .' '. $url,
                 "error_description"=>"Can't make request on null endpoint",
             ]);
         }
@@ -55,43 +57,34 @@ class API {
             $this->response = null;
         }
         else if ($http_code == 412) { // unauthorized
-            Presenter::present('generics.top_unauthorised');
+            Presenter::present('generics.unauthorised');
         }
 
+        
         else if (!in_array($http_code, [200, 201])) {
-            $message = '';
-            if(app('debug') == true)
-                $message .= "<code><a target='blank' href='{$url}'>'{$url}'</a></code>";
 
             if($http_code == 0) {
-                $message .= '<br>Make sure the backend is working and refresh';
+                $response = Translation::translate('is_api_working');
             }
 
-            if($response)
-                $res_html = "<pre style='max-height: 400px'>".htmlentities($response) . "</pre>";
-            else
-                $res_html = ''; 
-            Presenter::present("generics.top_error", [
-                "error_info" => Translation::translate('failure')."- API",
+            if($http_code == 404) {
+                $response = Translation::translate('not_found_api');
+            }
+
+            Presenter::present("generics.error", [
+                "error_info" => "API",
                 "error_code" => $http_code,
-                "error_description"=>$message,
-                "error_description"=>$message.$res_html,
+                "error_description"=>$response ?? "Error",
+                "url" => $this->method .' '. $url,
             ]);
+
+            exit();
         }
 
         else {
             $this->response = $response;
         }
 
-        // else {
-        // // $message = "Failed to get consequent data from <code><a target='blank' href='{$url}'>'{$url}'</a></code>";
-        // //   Presenter::present("generics.global_error", [
-        // //       "error_info" => "Failed - API",
-        // //       "error_code" => $http_code,
-        // //       "error_description"=>$message,
-        // //   ]);
-        //     $this->$response = $response;
-        // }
         curl_close($this->ch);
         
         return $this;
@@ -107,6 +100,8 @@ class API {
     public function get($url, array $data = []) {
         $this->reinit();
 
+        $this->method = 'GET';
+
         $this->url = $url;
         $this->url = sprintf("%s?%s", $this->url, http_build_query($data));
 
@@ -116,6 +111,8 @@ class API {
 
     public function post($url, array $data = null) {
         $this->reinit();
+
+        $this->method = 'POST';
 
         $this->url = $url;
         curl_setopt($this->ch, CURLOPT_URL, $this->url);
@@ -134,6 +131,8 @@ class API {
     public function put($url, array $data = null) {
         $this->reinit();
 
+        $this->method = 'PUT';
+
         $this->url = $url;
 
         curl_setopt($this->ch, CURLOPT_URL, $this->url);
@@ -142,7 +141,7 @@ class API {
             if(app('content-type') == 'application/json') {
                 $data = json_encode($data);
             }
-            curl_setopt($this->ch, CURLOPT_POSTFIELDS, $data);
+            curl_setopt($this->ch, CURLOPT_POSTFIELDS, http_build_query($data));
         }
         return $this->call();
     }
@@ -167,6 +166,8 @@ class API {
 
         $this->reinit();
 
+        $this->method = strtoupper($method);
+
         $query_ext = $this->transform_data($data);
 
         $this->url = $url.$query_ext;
@@ -174,39 +175,17 @@ class API {
         curl_setopt($this->ch, CURLOPT_URL, $this->url);
         switch ($method){
             case "POST":
-                curl_setopt($this->ch, CURLOPT_POST, 1);
-                if ($data) {
-                    if(app('content-type') == 'application/json') {
-                        $data = json_encode($data);
-                    }
-                    curl_setopt($this->ch, CURLOPT_POSTFIELDS, $data);
-                }
+                return $this->post($this->url, $data);
                 break;
             case "PUT":
-                curl_setopt($this->ch, CURLOPT_CUSTOMREQUEST, "PUT");
-                if ($data) {
-                    if(app('content-type') == 'application/json') {
-                        $data = json_encode($data);
-                    }
-                    curl_setopt($this->ch, CURLOPT_POSTFIELDS, $data);
-                }
+                return $this->put($this->url, $data);
                 break;
             case "DELETE":
-                curl_setopt($this->ch, CURLOPT_CUSTOMREQUEST, "DELETE");
-                if ($data) {
-                    if(app('content-type') == 'application/json') {
-                        $data = json_encode($data);
-                    }
-                    curl_setopt($this->ch, CURLOPT_POSTFIELDS, $data);
-                }
-                return $this->call();
+                return $this->delete($this->url, $data);
                 break;
             default:
-                $this->url = sprintf("%s?%s", $url, http_build_query($data));
-                curl_setopt($this->ch, CURLOPT_URL, $this->url);
+                return $this->get($this->url, $data);
         }
-
-        return $this->call();
     }
 
     private function transform_data(array &$data) {

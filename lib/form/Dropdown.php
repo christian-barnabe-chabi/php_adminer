@@ -4,10 +4,10 @@ namespace Lib\form;
 
 class Dropdown {
     private $element;
-    public function __construct($name, $default_value = '', $default_text='', $required = '')
+    public function __construct($name, $default_value = '', $default_text = '', $required = '', $id = '', $class = '')
     {
         $this->element = "
-        <div class='ui fluid search selection dropdown'>
+        <div class='ui fluid search selection dropdown small {$class}' id='{$id}'>
             <input {$required} autocomplete='new-password' type='hidden' name='{$name}' value='{$default_value}' autocomplete='off'>
             <i class='dropdown icon'></i>
             <div class='default text'>
@@ -21,7 +21,7 @@ class Dropdown {
         $active = $active ? "active" : '';
         $image = $image ? "<img class='ui large avatar image' src='{$image}' style='height: 35px; width: 35px'>" : '';
         $this->element .= "
-        <div class='item {active}' data-value='{$value}'>
+        <div class='item {$active}' data-value=\"". $value ."\">
         {$image}
         {$text}
         </div>";

@@ -7,11 +7,15 @@ use Services\Router;
 
 class Logout extends AbstractsResource {
 
-    public function handle(array $data = [])
+    public function __construct()
     {
         unset($_SESSION['oauth']);
-        unset($_SESSION['ENV']);
         Router::redirect("login");
+    }
+
+    public function handle(array $data = [])
+    {
+        
     }
 }
 

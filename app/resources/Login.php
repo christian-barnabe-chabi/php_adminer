@@ -10,12 +10,16 @@ use Services\Translation;
 
 class Login extends AbstractsResource {
 
-    public function handle(array $data = [])
+    public function __construct()
     {
         if(!app('must_auth') || Auth::user()) {
-            Router::redirect(app('entrypoint'));
+            Router::redirect(app('entrypoint', 'dashboard'));
         }
+    }
 
+
+    public function handle(array $data = [])
+    {
         $data = (Object) $data;
     
         if (isset($data->email) and isset($data->password)) {
