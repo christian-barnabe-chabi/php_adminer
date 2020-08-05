@@ -18,7 +18,7 @@ use Services\Translation;
             </div>
 
             <div class="column ui five wide">
-                <form class="ui segment <?= app('primary_color') ?>" action="" method="post">
+                <form class="ui segment <?= app('primaryColor') ?>" action="" method="post">
                     <small class=" uk-text-center uk-text-danger"><?= isset($data['error']) ? $data['error'] : '' ?></small>
                     <div class="ui form">
                         <div class="field">
@@ -30,7 +30,7 @@ use Services\Translation;
                             <input id="password" type="password" placeholder="Password" name="password" value="">
                         </div>
                         <div class="field">
-                            <button class="ui button <?= app('primary_color') ?> fluid"><?= Translation::translate('login') ?></button>
+                            <button class="ui button <?= app('primaryColor') ?> fluid"><?= Translation::translate('login') ?></button>
                         </div>
                         <div class="field uk-text-right">
                             <!-- <a href="<?= Resource::link('password_reset') ?>" class='uk-link-muted uk-link-reset ui label orange'> <?= Translation::translate('password_forgot') ?> </a> -->

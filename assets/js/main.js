@@ -2,6 +2,24 @@ $(document).ready(() => {
     init();
     auto_fix();
 
+    if(localStorage.getItem('mode') == 'night') {
+        $('#selected-theme').checkbox('check')
+    } else {
+        $('#selected-theme').checkbox('uncheck')
+    }
+
+    $('#selected-theme').checkbox({
+        onChecked : () => {
+                localStorage.setItem('mode', 'night');
+                setMode();
+        },
+
+        onUnchecked : () => {
+                localStorage.setItem('mode', 'light');
+                setMode();
+        }
+    })
+
     var myTable = $('#table_of_resource');
 
 
@@ -34,7 +52,7 @@ $(document).ready(() => {
     margin_top = document_height - login_container_height - login_container_height/2;
     $('#login_form_container').css('margin-top', margin_top/2);
 
-    $('#side-menu, #main-container').fadeIn(500, ()=>{$('#spinner').hide(100)});
+    $('#side-menu, #main-container').fadeIn(500, ()=>{$('#spinner').hide(200)});
 
     $(window).resize((e)=> {
         auto_fix()
@@ -46,6 +64,16 @@ $(document).ready(() => {
         all_checked = true;
     }
 
+    $('.selected_ids').each((index, elem)=>{
+        if($(elem).is(':checked')) {
+            $(elem).parents('tr').addClass('selected_row');
+        }
+    })
+    
+    $('.selected_ids').on('click', (event) => {
+        $(event.target).parents('tr').toggleClass('selected_row');
+    })
+
     $('#check_all_objcts').on('click', (event)=> {
         let checkboxes = $('.selected_ids');
         
@@ -56,6 +84,12 @@ $(document).ready(() => {
                 const element = checkboxes[checkbox];
                 if($(element).parent().parent().css('display') == 'table-row') {
                     $(element).prop('checked', all_checked);
+                }
+
+                if($(element).is(':checked')) {
+                    $(element).parents('tr').addClass('selected_row');
+                } else {
+                    $(element).parents('tr').removeClass('selected_row');
                 }
             }
         }

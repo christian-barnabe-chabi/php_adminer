@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Resources;
+namespace App\Providers;
 
 use Abstracts\Resource as AbstractsResource;
 use Services\Router;

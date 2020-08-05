@@ -1,18 +1,18 @@
 <?php
 
-namespace App\Resources;
+namespace App\Providers;
 
-use Abstracts\Resource as AbstractsResource;
+use Abstracts\Resource;
 use Services\Auth;
 use Services\Presenter;
 use Services\Router;
 use Services\Translation;
 
-class Login extends AbstractsResource {
+class Login extends Resource {
 
     public function __construct()
     {
-        if(!app('must_auth') || Auth::user()) {
+        if(!app('mustAuth') || Auth::user()) {
             Router::redirect(app('entrypoint', 'dashboard'));
         }
     }
@@ -23,13 +23,16 @@ class Login extends AbstractsResource {
         $data = (Object) $data;
     
         if (isset($data->email) and isset($data->password)) {
-            new Auth($data->email, $data->password);
+            Auth::attempt($data->email, $data->password);
     
             $data->error = Translation::translate('login_error');
-            
         }
         if( ! Auth::user() ) {
-            Presenter::present('sign-in', (Array)$data);
+            if(file_exists($_SERVER['DOCUMENT_ROOT'].'/views/login.php')) {
+                Presenter::present('login', (Array)$data);
+            } else {
+                Presenter::present('generics.login', (Array)$data);
+            }
             exit();
         }
     }

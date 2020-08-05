@@ -23,7 +23,7 @@ use Services\Translation;
                 <?php if(!isset($data['reset_email_sent'])): ?>
 
                     
-                <form class="ui segment <?= app('primary_color') ?>" action="" method="post">
+                <form class="ui segment <?= app('primaryColor') ?>" action="" method="post">
                     <small><?= Translation::translate('reset_password_indication') ?></small>
                     <div class="ui divider"></div>
                     <div class="ui form">
@@ -32,7 +32,7 @@ use Services\Translation;
                             <input id="email" required type="text" placeholder="Email" name="reset_email" value=""  >
                         </div>
                         <div class="field">
-                            <button class="ui button <?= app('primary_color') ?> fluid"><?= Translation::translate('reset_password') ?></button>
+                            <button class="ui button <?= app('primaryColor') ?> fluid"><?= Translation::translate('reset_password') ?></button>
                         </div>
                         <div class="field uk-text-right">
                             <a href="<?= Resource::link('login') ?>" class='uk-link-muted uk-link-reset ui label blue'> <?= Translation::translate('login') ?> </a>
@@ -42,7 +42,7 @@ use Services\Translation;
 
                 <?php else :?>
 
-                <div class="ui segment <?= app('primary_color') ?>">
+                <div class="ui segment <?= app('primaryColor') ?>">
                     <small><?= Translation::translate('reset_password_check_email_indication') ?></small>
                     <div class="ui divider"></div>
                     <a href="<?= Resource::link('login') ?>" class='uk-link-muted uk-link-reset ui label blue'> <?= Translation::translate('login') ?> </a>

@@ -40,22 +40,23 @@
 
 ### Base configurations
 
-```json
 {
-    "base_url" : "http://chrisserver.me:8000/api",
-    "origin" : "http://chrisserver.me:8000",
+    "baseUrl" : "localhost:8000/api",
     "entrypoint" : "dashboard",
-    "primary_color" : "green",
-    "colorful" : true,
-    "auth_type" : "Bearer",
-    "must_auth" :false,
-    "login_endpoint" : "/login",
-    "login_method" : "GET",
-    "app_name" : "PHP Adminer v2.0",
+    "primaryColor" : "green",
+    "secondaryColor" : "orange",
+    "colorful" : false,
+    "authType" : "Bearer",
+    "mustAuth" :true,
+    "loginEndpoint" : "/login",
+    "loginMethod" : "POST",
+    "tokenKey": "token",
+    "appName" : "PHP Adminer",
     "lang": "en",
     "icon":"",
-    "date_format" : "d/m/Y",
-    "debug":true
+    "dateFormat" : "d/m/Y",
+    "theme":"light",
+    "debug":false
 }
 ```
 
@@ -120,7 +121,7 @@ ResourceScaffold::define('Users', 'user', 'angle right');
 
 Once the blueprint created, complete the `$endpoints` class attribute where it must be specified the endpoints for listing, showing single element, deleting, creating/saving and updating. To specified that `PHP ADMINER` must add the concerned `id`, just make it know by adding `{id}` at the place.
 
-As the `base_url` is set in the `env` file, `PHP ADMINER` will append each endpoint to it.
+As the `baseUrl` is set in the `env` file, `PHP ADMINER` will append each endpoint to it.
 
 ```php
 protected endpoints = [
@@ -132,12 +133,12 @@ protected endpoints = [
 ];
 ```
 
-Let's assume the `base_url` is defined as follow in `.env.json`
+Let's assume the `baseUrl` is defined as follow in `.env.json`
 
 ```json
 {
     // ...
-	"base_url":"http://api.mydomain.com",
+	"baseUrl":"http://api.mydomain.com",
     // ...
 }
 ```
@@ -274,7 +275,7 @@ Router::redirect('dashboard');
 
 ### Public Routes
 
-By default, all routes will be private when `must_auth` is true. That means, user must be authenticated before accessing the main screen otherwise the login page will be shown up. Sometime you will need to access certain pages without being authenticated. To do so, edit the `routes`  attribute of `PublicResource` class. Add all the routes you want to make public
+By default, all routes will be private when `mustAuth` is true. That means, user must be authenticated before accessing the main screen otherwise the login page will be shown up. Sometime you will need to access certain pages without being authenticated. To do so, edit the `routes`  attribute of `PublicResource` class. Add all the routes you want to make public
 
 ```php
 private static $routes = [
@@ -301,7 +302,7 @@ Once the API respond with data, `Auth` will look for `token` key in the response
 
 ### Authenticateable
 
-`PHP ADMINER` uses the `Authenticateable` class to determiner if it might authenticate the user or not before pursuing. Of course, you do not need to change anything, else in `.env.json` file by setting the `must_auth` `true` or `false`.
+`PHP ADMINER` uses the `Authenticateable` class to determiner if it might authenticate the user or not before pursuing. Of course, you do not need to change anything, else in `.env.json` file by setting the `mustAuth` `true` or `false`.
 
 ### API
 

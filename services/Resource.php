@@ -13,28 +13,23 @@ class Resource
     private static $generated_code;
     private static $handle_methode_name = "handle";
 
-    public static function load(string $resource, array $data = [], $handle_methode_name = 'handle')
+    public static function load(string $resource_class, array $data = [], $handle_methode_name = 'handle')
     {
-
-        self::$handle_methode_name = $handle_methode_name;
-        $resource_class = '\\App\\Resources\\'.ucwords($resource);
-        $resource_class = str_replace('_', ' ', $resource_class);
-        $resource_class = ucwords($resource_class);
-        $resource_class = str_replace(' ', '', $resource_class);
-
-
+        
         if (class_exists($resource_class, false)) {
             
+            $data = array_merge((Array)Request::$request, $data);
+
             self::$resource = new $resource_class($data);
 
             if (method_exists(self::$resource, 'get_model_name')) {
-                self::$page_title = self::$resource->get_model_name();
+                self::$page_title = self::$resource->get_model_name() .' | ';
             } else {
-                self::$page_title = Translation::translate($resource);
+                self::$page_title = Request::$request->php_admin_resource ? Translation::translate(Request::$request->php_admin_resource).' | ' : ' ';
             }
     
             self::$page_title = str_replace('_', ' ', self::$page_title);
-            self::$page_title = ucfirst(self::$page_title).' | '.app('app_name');
+            self::$page_title = ucfirst(self::$page_title);
             self::open_tags();
 
             $handler = self::$handle_methode_name;
@@ -66,9 +61,8 @@ class Resource
     public static function open_tags()
     {
 
-        $title = ucfirst(strtolower(self::$page_title));
+        $title = ucfirst(strtolower(self::$page_title)) . strtoupper(app('appName'));
         $favicon = app('icon');
-        $theme = app('theme', 'light') == 'night' ? "<link rel='stylesheet' href='/assets/css/night.css'>" : "";
         echo "
         <!DOCTYPE html>
         <html lang='en'>
@@ -80,6 +74,7 @@ class Resource
             <script src='/assets/js/jquery.js'></script>
             <link rel='stylesheet' href='/assets/SemanticUI/semantic.min.css'>
             <script src='/assets/SemanticUI/semantic.min.js'></script>
+            <script src='/assets/js/modes.js'></script>
             <script src='/assets/SemanticUI/tablesort.js'></script>
             <link rel='stylesheet' href='/assets/uikit/css/uikit.min.css'>
             <link rel='stylesheet' href='/assets/uikit/css/uikit-rtl.min.css'>
@@ -91,17 +86,22 @@ class Resource
             <script src='/assets/js/paginator.js' defer></script>
             <script src='/assets/js/table_search.js' defer></script>
             <script src='/assets/js/example.js' defer></script>
-            $theme
         </head>
         <body class='uk-margin-remove uk-padding-remove'>
         ";
-        Presenter::present('header');
+
+        if(file_exists($_SERVER['DOCUMENT_ROOT'].'/views/header.php')) {
+            Presenter::present('header');
+        } else {
+            Presenter::present('generics.header');
+        }
+
 
         echo "
             <div class='ui container fluid'>
-                <div class='uk-text-center'>
-                    <span uk-spinner='ratio: 3' id='spinner'></span>
-                </div>
+                <!--div class='uk-text-center'>
+                    <span uk-spinner='ratio: 9' id='spinner'></span>
+                </div-->
     
                 <div class='uk-position-relative uk-padding-small' id='main-container'>
         ";
@@ -142,13 +142,13 @@ class Resource
             self::$resource = new $resource_class();
 
             if (method_exists(self::$resource, 'get_model_name')) {
-                self::$page_title = self::$resource->get_model_name();
+                self::$page_title = self::$resource->get_model_name().' | ';
             } else {
-                self::$page_title = Translation::translate($resource);
+                self::$page_title = Translation::translate($resource).' | ';
             }
     
             self::$page_title = str_replace('_', ' ', self::$page_title);
-            self::$page_title = ucfirst(strtolower(self::$page_title)).' | '.app('app_name');
+            self::$page_title = ucfirst(strtolower(self::$page_title));
 
             $handler = self::$handle_methode_name;
             if (method_exists(self::$resource, $handler)) {
@@ -202,6 +202,25 @@ class Resource
             ]);
             self::close_tags();
         };
+    }
+
+    public static function routeDetail($route) {
+        $route = str_replace($_SERVER['HTTP_ORIGIN'], '', $route);
+        $route = preg_replace("#^(/)\.*#", '', $route);
+        $route = explode('?', $route)[0];
+        $route = explode('/', $route);
+
+        $detail = [
+            'resource' => null,
+            'action' => null,
+            'uid' => null,
+        ];
+
+        $detail['resource'] = $route[0] ?? null;
+        $detail['action'] = $route[1] ?? null;
+        $detail['uid'] = $route[2] ?? null;
+
+        return (Object) $detail;
     }
 }
 

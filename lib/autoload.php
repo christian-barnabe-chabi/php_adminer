@@ -21,6 +21,7 @@ spl_autoload_register(function($class_name) {
 
 });
 
+include_files_in("app/providers");
 include_files_in("app/resources");
 include_files_in("lib");
 include_files_in("config");

@@ -29,7 +29,7 @@ use Services\Translation;
         </div>
 
         <div class="uk-text-right">
-            <small class=""> <?= DateFormater::format(app('date_format'), $notification->publish) ?> </small>
+            <small class=""> <?= DateFormater::format(app('dateFormat'), $notification->publish) ?> </small>
         </div>
     </div>
 </div>

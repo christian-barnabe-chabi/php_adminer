@@ -80,6 +80,17 @@ else if (preg_match("/(^serve\s*($|--host=(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})))
     serve_on($host, $port);
 }
 
+else if (preg_match("/^copy presenter:(\w*)/", $cmd, $matches)) {
+    $file = $matches[1];
+    $source = "./views/generics/$file.php";
+    $destination = "./views/$file.php";
+    if(file_exists($source)) {
+        copy($source, $destination);
+        exit("Task done\n");
+    }
+    exit("Not exists\n");
+}
+
 else {
     exit("\33[31mError: invalid command\n\33[39m");
 }
@@ -110,6 +121,8 @@ function scaffold_blueprint_class_file($class) {
 <?php
 namespace App\Resources;
 
+use Abstracts\BaseBlueprint;
+
 class $class extends BaseBlueprint {
     protected \$endpoints = [
         "list"=>"",
@@ -119,7 +132,7 @@ class $class extends BaseBlueprint {
         "delete"=>"",
     ];
 
-    // protected \$column_scaffold =  [];
+    // protected \$columns =  [];
 
 }
 

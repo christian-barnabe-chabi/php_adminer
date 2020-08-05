@@ -2,7 +2,7 @@
 
 namespace App\Scaffolding;
 
-use App\Resources\BaseBlueprint;
+use Abstracts\BaseBlueprint;
 use Services\API;
 use Services\Auth;
 use Lib\form\Checkbox;
@@ -30,8 +30,10 @@ class EditGuesserModal {
 
         $keys = array_keys($blueprint->get_columns());
 
-        $elements = "<form autocomplete='new-password' action='/{$resource}/update/{$uid}' method='POST' enctype='multipart/form-data'>";
+        $elements = "<form autocomplete='new-password' action='/{$resource}' method='POST' enctype='multipart/form-data'>";
 
+            $elements .= "<input name='php_admin_action' type='hidden' value='update'>";
+            $elements .= "<input name='php_admin_uid' type='hidden' value='$uid'>";
             $elements .= "<div class='ui three column stackable grid'>";
 
                 foreach ($keys as $value) {
@@ -120,7 +122,7 @@ class EditGuesserModal {
                                         if($column->image) {
 
                                             if(!preg_match("/(http(s)?:\/\/)?(www.)?.\w{2,6}/i", $old_value)) {
-                                                $old_value = preg_replace('/$\//', '', app('base_url')) .'/'. preg_replace('/^\//', '', $old_value);  
+                                                $old_value = preg_replace('/$\//', '', app('baseUrl')) .'/'. preg_replace('/^\//', '', $old_value);  
                                             }
 
                                             $label  = "<label for='".$value."' uk-lightbox>".$column->name.$required_indicator."<small> (<a href='$old_value'>". Translation::translate('click_to_preview') .")</a></small></label>";
@@ -141,8 +143,8 @@ class EditGuesserModal {
                         }
 
                         $api = new API();
-                        $api->header("Authorization", app('auth_type').' '.Auth::token());
-                        $api->callWith(app('base_url').$column->endpoint, $column->fetch_method);
+                        $api->header("Authorization", app('authType').' '.Auth::token());
+                        $api->callWith(app('baseUrl').$column->endpoint, $column->fetch_method);
                         $sub_response = $api->response();
 
 
@@ -334,7 +336,7 @@ class EditGuesserModal {
                     $image = '';
                     if($column->image) {
                         if(!preg_match("/(http(s)?:\/\/)?(www.)?.\w{2,6}/i", $old_value)) {
-                            $old_value = preg_replace('/$\//', '', app('base_url')) .'/'. preg_replace('/^\//', '', $old_value);  
+                            $old_value = preg_replace('/$\//', '', app('baseUrl')) .'/'. preg_replace('/^\//', '', $old_value);  
                         }
                         $label  = "<label for='".$value."' uk-lightbox>".$column->name.$required_indicator."<small> (<a href='$old_value'>". Translation::translate('click_to_preview') .")</a></small></label>";
                     }
@@ -363,7 +365,7 @@ class EditGuesserModal {
             $elements .= "</div>";
 
             $elements .= "<div class='uk-margin uk-text-right'>";
-                $elements .= "<button class='ui button yellow small' type='submit'><i class='ui icon check'></i>". Translation::translate("update") ."</button>";
+                $elements .= "<button class='ui button yellow small' type='submit'><i class='ui icon check'></i>". Translation::translate("save") ."</button>";
             $elements .= "</div>";
 
 

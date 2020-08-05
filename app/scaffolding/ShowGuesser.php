@@ -2,7 +2,7 @@
 
 namespace App\Scaffolding;
 
-use App\Resources\BaseBlueprint;
+use Abstracts\BaseBlueprint;
 use Services\API;
 use Services\Auth;
 use Services\DateFormater;
@@ -26,7 +26,7 @@ class ShowGuesser {
         $resource = Request::$request->php_admin_resource;
 
         $api = new API();
-        $api->header("Authorization", app('auth_type').' '.Auth::token());
+        $api->header("Authorization", app('authType').' '.Auth::token());
         $response = $api->get($url)->response();
         
         if(is_array($response)) {
@@ -253,7 +253,7 @@ class ShowGuesser {
                             $sub_body .= "<td class='collapsing'>$sub_key</td>";
                             $sub_value = preg_replace("/(http(s)?:\/\/.*)/i", "<a href='$1' target='_blank'>$1</a>", $sub_value);
                             $sub_value = preg_replace("/(\w+((\.)?(\w)+)*@\w+(.\w{2,3}){1,})/i", "<a href='mailto:$1' target='_blank'>$1</a>", $sub_value);
-                            $sub_value = DateFormater::format(app('date_format'), $sub_value);
+                            $sub_value = DateFormater::format(app('dateFormat'), $sub_value);
                             $sub_body .= "<td>$sub_value</td>";
                         $sub_body .= "</tr>";
                     }
@@ -330,7 +330,7 @@ class ShowGuesser {
                 <span 
                     onclick=\"
                         $('#confirm_delete').modal({
-                            transition: 'fly down',
+                            transition: 'fly',
                         }).modal('show')\"
                     
                     class='ui button mini orange basic' >
@@ -344,9 +344,11 @@ class ShowGuesser {
                     $delete_modal_confirm .= Translation::translate('are_you_sure_to_delete');
                 $delete_modal_confirm .= "</div>";
     
-                $delete_modal_confirm .= "<form method='POST' class='actions' action='/{$resource}/delete/{$uid}'>";
-                    $delete_modal_confirm .= "<button type='submit' class='ui button small orange'>". Translation::translate('yes') ."</button>";
-                    $delete_modal_confirm .= "<button type='button' class='ui button small olive deny'>". Translation::translate('no') ."</button>";
+                $delete_modal_confirm .= "<form method='POST' class='actions' action='/{$resource}'>";
+                    $delete_modal_confirm .= "<input name='php_admin_action' type='hidden' value='delete'>";
+                    $delete_modal_confirm .= "<input name='php_admin_uid' type='hidden' value='$uid'>";
+                    $delete_modal_confirm .= "<button type='submit' class='ui button small orange'>". Translation::translate('delete') ."</button>";
+                    $delete_modal_confirm .= "<button type='button' class='ui button small olive deny'>". Translation::translate('cancel') ."</button>";
                 $delete_modal_confirm .= "</form>";
             $delete_modal_confirm .= "</div>";
         }
@@ -354,7 +356,7 @@ class ShowGuesser {
 
         // edit create button if needed
         $edit_element = "";
-        $modal_form = "";
+        $update_modal_forms = "";
         if($blueprint->editable()) {
             $modal_data_id = substr(md5($uid), 0, 10);
             $edit_element = "
@@ -370,22 +372,23 @@ class ShowGuesser {
 
             // edit form for update
             $class = get_class(self::$blueprint);
-            $modal_form = "<div class='ui modal' id='$modal_data_id'>";
-                $modal_form .= "<div class='header'>";
-                    $modal_form .= Translation::translate('update');
-                $modal_form .= "</div>";
+            $update_modal_forms = "<div class='ui large modal' id='$modal_data_id'>";
+                $update_modal_forms .= "<div class='header'>";
+                    $update_modal_forms .= $blueprint->get_name_singular() ." > ". Translation::translate('update');
+                $update_modal_forms .= "</div>";
 
-                $modal_form .= "<div class='content scrolling'>";
-                    $modal_form .= Resource::call($class, (Array)$response, 'edit_form_modal');
-                $modal_form .= "</div>";
-            $modal_form .= "</div>";
+                $update_modal_forms .= "<div class='content scrolling'>";
+                    $update_modal_forms .= Resource::call($class, (Array)$response, 'edit');
+                $update_modal_forms .= "</div>";
+            $update_modal_forms .= "</div>";
         }
 
         // export create button if needed
         $export_element = "";
         if($blueprint->exportable()) {
             $export_element = "
-                <form action='/{$resource}/export/' method='POST' class='uk-display-inline'>
+                <form action='/{$resource}' method='POST' class='uk-display-inline'>
+                    <input type='hidden' name='php_admin_export'>
                     <button name='selected_id[]' value='{$uid}' type='submit' class='ui button mini teal basic' >
                         <i class='ui icon save'></i>
                         ". Translation::translate("export") ."
@@ -395,7 +398,7 @@ class ShowGuesser {
         }
 
         // scaffolding
-        $primary_color = app('primary_color');
+        $primary_color = app('primaryColor');
         $element = "";
         if($blueprint->editable() OR $blueprint->deleteable() OR $blueprint->exportable()) {
             $element .= "
@@ -451,13 +454,13 @@ class ShowGuesser {
         $element .= "</div>";
 
         // echo $element;
-        $element .= $modal_form;
+        $element .= $update_modal_forms;
         $element .= $delete_modal_confirm;
         return $element;
     }
 
     private static function make_table($head, $body, string $max_height = 'auto', $single_line = true) {
-        $primary_color = app('primary_color');
+        $primary_color = app('primaryColor');
         $element = "";
 
         $single_line = $single_line ? ' single line ' : '';
@@ -514,7 +517,7 @@ class ShowGuesser {
 
         // link
 
-        $cell_value = DateFormater::format(app('date_format'), $cell_value);
+        $cell_value = DateFormater::format(app('dateFormat'), $cell_value);
 
         $re1 = '/(http(s)?:\/\/)(www.)?((\w|-|_)+\.\w{2,5}(\/(\w|\?|\=|-|_)*)*)/i';
         $re2 = '/(\w+((\.|-|_)?(\w)+)*@(\w+|-|_|\.)+\.\w{2,5})/i';

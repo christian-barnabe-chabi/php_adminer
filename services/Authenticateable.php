@@ -9,8 +9,8 @@ Class Authenticateable {
         // TODO cache the incomming request
 
         if(!Auth::user()) {
-            $_SESSION['request'] = Request::$request;
-            Resource::load('login', (Array)Request::$request);
+            Resource::load('App\Providers\Login');
+            exit();
         }
     }
 

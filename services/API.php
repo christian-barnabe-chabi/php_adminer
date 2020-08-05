@@ -64,7 +64,7 @@ class API {
         else if (!in_array($http_code, [200, 201])) {
 
             if($http_code == 0) {
-                $response = Translation::translate('is_api_working');
+                $response = "<code>{$this->url}</code><br>".Translation::translate('is_api_working');
             }
 
             if($http_code == 404) {

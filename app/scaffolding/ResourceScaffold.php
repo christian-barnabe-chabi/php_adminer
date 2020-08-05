@@ -13,11 +13,11 @@ class ResourceScaffold {
         $match = explode('/', $href);
         $active = self::match_menu($match[0]);
         $class = $active ? ' active ' : '';
-        $secondary_color = app('secondary_color', 'rgba(0, 172, 29, 0.979)');
+        $secondaryColor = app('secondaryColor', 'rgba(0, 172, 29, 0.979)');
 
         if($active)
             self::$elements .= "
-            <a class='{$class} item' style='background-color: $secondary_color !important' href='/$href'>
+            <a class='{$class} item' style='background-color: $secondaryColor !important' href='/$href'>
                 <span>
                     <i class='ui {$icon} icon'></i>
                     {$name}
@@ -34,7 +34,7 @@ class ResourceScaffold {
     }
 
     public static function render() {
-        $primary_color = app('primary_color');
+        $primary_color = app('primaryColor');
         $inverted = app('colorful') ? 'inverted segment' : '';
         $bg_white = empty($inverted)  ? 'background: white' : '';
         echo"

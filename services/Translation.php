@@ -2,16 +2,10 @@
 namespace Services;
 
 class Translation {
-    static $translations;
 
     public static function translate(string $word) {
-        $translation = trim($word);
-        if(empty(app('lang'))) {
-            exit('Language value not set in env variables');
-        }
-        $lang = app('lang');
+        if(!isset($_SESSION['transalation'])) {
 
-        if(self::$translations == null) {
             $file = fopen($_SERVER['DOCUMENT_ROOT']."/.translations.json", "r");
             $file_lines = '';
             while($line = fgets($file)) {
@@ -20,12 +14,16 @@ class Translation {
 
             $file_lines = str_replace("\n", '', $file_lines);
 
-            self::$translations = json_decode($file_lines);
-        }
+            $_SESSION['transalation'] = json_decode($file_lines);
 
-        if(isset(self::$translations->$translation)) {
-            if(isset(self::$translations->$word->$lang)) {
-                $translation = self::$translations->$word->$lang;
+        }
+        $translation = trim($word);
+        
+        $lang = app('lang', 'en');
+
+        if(isset($_SESSION['transalation']->$translation)) {
+            if(isset($_SESSION['transalation']->$word->$lang)) {
+                $translation = $_SESSION['transalation']->$word->$lang;
             }
         }
 
@@ -34,7 +32,7 @@ class Translation {
 
     public static function define($word, Array $values) {
         foreach ($values as $lang => $translation) {
-            self::$translations->$word->$lang = $translation;
+            $_SESSION['transalation']->$word->$lang = $translation;
         }
     }
 }

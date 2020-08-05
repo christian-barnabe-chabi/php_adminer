@@ -1,5 +1,5 @@
 <?php
-namespace App\Resources;
+namespace Abstracts;
 
 use Abstracts\Resource;
 use App\Scaffolding\CreateGuesser;
@@ -14,6 +14,7 @@ use Services\API;
 use Services\Auth;
 use Services\Presenter;
 use Services\Request;
+use Services\Resource as ServicesResource;
 use Services\Router;
 use Services\Translation;
 
@@ -21,7 +22,7 @@ abstract class BaseBlueprint extends Resource {
     protected $url;
     protected $endpoints;
     protected $guarded = ['id', 'created_at', 'updated_at', 'deleted_at'];
-    protected $column_scaffold = [];
+    protected $columns = [];
     protected $data_fetched;
     protected $must_be_auth = true;
     protected $api;
@@ -32,16 +33,14 @@ abstract class BaseBlueprint extends Resource {
     protected $uid = 'id';
     protected $model = null;
     protected $hidden = [];
-    protected $paginate = false;
     protected $title = [];
     protected $callbacks = [];
     protected $widgets_positions = [];
-    protected   $data;
-    protected   $action; // request action -
+    protected $data;
+    protected $action; // request action -
 
     public function __construct()
     {
-
         $data = clone Request::$request;
         $this->action = clone (Object) $data;
         
@@ -66,62 +65,27 @@ abstract class BaseBlueprint extends Resource {
         $this->api = new API();
 
         if($this->must_be_auth and Auth::user()) {
-            $this->api->header("Authorization", app('auth_type').' '.Auth::token());
+            $this->api->header("Authorization", app('authType').' '.Auth::token());
         }
 
         if(isset(Request::$request->php_admin_update) || isset(Request::$request->php_admin_save) || isset(Request::$request->php_admin_delete) || isset(Request::$request->php_admin_export)) {
             // updating or saving or deleting or exporting
         } else {
 
-            $this->url = app('base_url').$this->endpoints["list"];
-
-            // pagination
-            if($this->paginate) {
-                $this->data_fetched = $this->api->get($this->url, (array)$data)->response();
-
-                if(isset($this->paginate['count'])) {
-                    $key = $this->paginate['count'];
-                    if(isset($this->data_fetched->$key)) {
-                        $this->paginate['count'] = $this->data_fetched->$key;
-                    }
-                    else {
-                        $this->paginate['count'] = null;
-                    }
-                } else {
-                    $this->paginate['count'] = null;
-                }
-
-                if(isset($this->paginate['last_page'])) {
-                    $key = $this->paginate['last_page'];
-                    if(isset($this->data_fetched->$key)) {
-                        $this->paginate['last_page'] = $this->data_fetched->$key;
-                    } else {
-                        $this->paginate['last_page'] = null;
-                    }
-                } else {
-                    $this->paginate['last_page'] = null;
-                }
-
-                if(isset($this->paginate['data_field'])) {
-                    $data_field = $this->paginate['data_field'];
-                    $this->data_fetched = $this->data_fetched->$data_field;
-                } else {
-                    exit('error');
-                }
-            } 
-            else {
-                $this->data_fetched = $this->api->get($this->url)->response();
-            }
+            $this->url = app('baseUrl').$this->endpoints["list"];
+            
+            $this->data_fetched = $this->api->get($this->url)->response();
 
             try {
-                if(PublicResource::isPublic(Router::route())) {
-
-                } else {
+                // if(PublicResource::isPublic(Router::route())) {
+                    
+                // } else {
                     // if(!is_array($this->data_fetched)) {
                     //     throw new Exception("Exception: An array is required for listing");
                     // }
                     $keys = $this->data_fetched[0] ?? null;
-                }
+                // }
+
 
                 if(isset($keys))
                     $keys = $keys != null ? (get_object_vars($keys)) : [];
@@ -130,26 +94,23 @@ abstract class BaseBlueprint extends Resource {
                 Presenter::present('generics.error', [
                     'url' => $this->url,
                     'error_code'=>500,
-                    'error_description' => $e->getMessage().'<br>Make sure the data is not null or are you getting paginated data?'
+                    'error_description' => $e->getMessage().'<br>Make sure the data is not null and is an array?'
                 ]);
                 exit('Error');
             }
 
-
-            // $keys = $keys != null ? (get_object_vars($keys)) : [];
-
-            if (empty($this->column_scaffold)) {
-                // if()
+            if (empty($this->columns)) {
                 foreach ($keys as $key=>$value) {
                     if (is_object($this->data_fetched[0]->$key) or is_array($this->data_fetched[0]->$key)) {
                         continue;
                     }
 
-                    $this->column_scaffold[$key] = [];
+                    $this->columns[$key] = [];
                 }
             }
 
-            foreach ($this->column_scaffold as $key => $value) {
+            // auto define type for columns
+            foreach ($this->columns as $key => $value) {
                 $type = null;
                 $exploded = explode('.', $key);
                 $new_key = $key;
@@ -159,41 +120,41 @@ abstract class BaseBlueprint extends Resource {
                 }
 
                 if(!empty($value['type'])) {
-                    $this->column_scaffold[$key]['type'] = $value['type'];
+                    $this->columns[$key]['type'] = $value['type'];
                 }
                 else
                 {
                     if(!isset($keys[$new_key])) {
-                        $this->column_scaffold[$key]['type'] = 'text';
+                        $this->columns[$key]['type'] = 'text';
                         continue;
                     }
 
                     $column = ($keys[$new_key]);
 
                     if(is_object($column)) {
-                        $this->column_scaffold[$key]['type'] = 'object';
+                        $this->columns[$key]['type'] = 'object';
                         continue;
                     }
                     if(is_array($column)) {
-                        $this->column_scaffold[$key]['type'] = 'array';
+                        $this->columns[$key]['type'] = 'array';
                         continue;
                     }
                     if(is_numeric($column)) {
-                        $this->column_scaffold[$key]['type'] = 'number';
+                        $this->columns[$key]['type'] = 'number';
                         continue;
                     }
 
                     if(preg_match("/\d\d\d\d-\d\d-\d\d\s\d\d:\d\d:\d\d/", $column)) {
-                        $this->column_scaffold[$key]['type'] = 'datetime';
+                        $this->columns[$key]['type'] = 'datetime';
                         continue;
                     }
 
                     if(preg_match("/\d\d\d\d-\d\d-\d\d/", $column)) {
-                        $this->column_scaffold[$key]['type'] = 'date';
+                        $this->columns[$key]['type'] = 'date';
                         continue;
                     }
 
-                    $this->column_scaffold[$key]['type'] = 'text';
+                    $this->columns[$key]['type'] = 'text';
                 }
 
             }
@@ -239,43 +200,15 @@ abstract class BaseBlueprint extends Resource {
         unset($this->data->php_admin_export);
 
         /**
-         * show the create form
-         */
-        // $this->model = $this->action->php_admin_resource;
-        // $this->model = ucwords(str_replace('_', ' ', $this->model));
-
-        if(isset($this->action->php_admin_create)) {
-            echo "<h3 class=' uk-heading-divider'>". $this->go_back() . $this->get_name_singular() ."</h3>";
-
-            echo $this->create();
-        }
-
-        /**
          * update
          */
-        else if(isset($this->action->php_admin_update)) {
-            echo "<h3 class=' uk-heading-divider'>". $this->go_back() . $this->get_name_singular() ."</h3>";
-
+        if(isset($this->action->php_admin_update)) {
             $this->validate(['uid'=>'']);
 
-            $this->url = app('base_url').$this->endpoints["update"];
+            $this->url = app('baseUrl').$this->endpoints["update"];
 
             $this->update((Array) $this->data);
 
-        }
-
-        /**
-         * show edit form
-         */
-        else if(isset($this->action->php_admin_edit)) {
-            echo "<h3 class=' uk-heading-divider'>". $this->go_back() . $this->get_name_singular() ."</h3>";
-            // echo "<h3 class=' uk-heading-divider'>". $this->go_back() . $this->model #". $this->action->uid ."</h3>";
-
-            $this->validate(['uid'=>'']);
-
-            $this->url = app('base_url').$this->endpoints["show"];
-
-            echo $this->edit();
         }
 
         /**
@@ -283,11 +216,10 @@ abstract class BaseBlueprint extends Resource {
          */
         else if( isset($this->action->php_admin_show)) {
             echo "<h3 class=' uk-heading-divider'>". $this->go_back() . $this->get_name_singular() ."</h3>";
-            // echo "<h3 class=' uk-heading-divider'>". $this->go_back() . $this->model #". $this->action->uid ."</h3>";
             
             $this->validate(['uid'=>'']);
             
-            $this->url = app('base_url').$this->endpoints["show"];
+            $this->url = app('baseUrl').$this->endpoints["show"];
         
             echo $this->show();
         }
@@ -296,11 +228,10 @@ abstract class BaseBlueprint extends Resource {
          * delete single object
          */
         else if( isset($this->action->php_admin_delete)) {
-            echo "<h3 class=' uk-heading-divider'>". $this->go_back() . $this->get_name_singular() ."</h3>";
 
             $this->validate(['uid'=>'']);
 
-            $this->url = app('base_url').$this->endpoints["delete"];
+            $this->url = app('baseUrl').$this->endpoints["delete"];
 
             $this->delete();
         }
@@ -309,26 +240,29 @@ abstract class BaseBlueprint extends Resource {
          * delete multiple objected
          */
         else if( isset($this->action->php_admin_delete_multiple)) {
-            echo "<h3 class=' uk-heading-divider'>". $this->go_back() . $this->get_name_plurial() ."</h3>";
+            // echo "<h3 class=' uk-heading-divider'>". $this->go_back() . $this->get_name_plurial() ."</h3>";
 
             $this->validate(['selected_id'=>Translation::translate('no_selected_ressources')]);
 
             foreach ($this->data->selected_id as $id) {
-                $this->url = app('base_url').$this->endpoints["delete"];
+                $this->url = app('baseUrl').$this->endpoints["delete"];
                 $this->action->uid = $id;
                 $this->delete(true);
             }
 
             Presenter::present('generics.success');
+            unset(Request::$request->php_admin_delete_multiple);
+            echo ServicesResource::call(get_class($this), (array)Request::$request);
+            exit();
         }
 
         /**
          * save object sent by create form
          */
         else if( isset($this->action->php_admin_save)) {
-            echo "<h3 class=' uk-heading-divider'>". $this->go_back() . $this->get_name_singular() ."</h3>";
+            // echo "<h3 class=' uk-heading-divider'>". $this->go_back() . $this->get_name_singular() ."</h3>";
 
-            $this->url = app('base_url').$this->endpoints["create"];
+            $this->url = app('baseUrl').$this->endpoints["create"];
             $this->save((Array)$this->data);
         }
 
@@ -340,7 +274,7 @@ abstract class BaseBlueprint extends Resource {
 
             $this->validate(['selected_id'=>Translation::translate('no_selected_ressources')]);
 
-            $this->url = app('base_url').$this->endpoints["show"];
+            $this->url = app('baseUrl').$this->endpoints["show"];
 
             $this->export($this->data->selected_id);
         }
@@ -349,13 +283,13 @@ abstract class BaseBlueprint extends Resource {
          * list fetched objects
          */
         else {
-            echo "<h3 class=' uk-heading-divider'> {$this->get_name_plurial()}</h3>";
+            echo "<h3 class=' uk-heading-divider uk-margin-remove-top'>{$this->get_name_plurial()} | ". Translation::translate('list') ."</h3>";
             echo $this->list();
         }
     }
 
     public function get_columns() {
-        return $this->column_scaffold;
+        return $this->columns;
     }
 
     protected function unset_guarded(string $value) {
@@ -396,11 +330,11 @@ abstract class BaseBlueprint extends Resource {
         return $this->guarded;
     }
 
-    protected function list() {
+    public function list() {
         return ListGuesser::render($this, $this->data_fetched);
     }
 
-    protected function create() {
+    public function create() {
         if(!$this->createable) {
             Presenter::present('generics.unauthorised');
             exit();
@@ -410,7 +344,7 @@ abstract class BaseBlueprint extends Resource {
 
     protected function save(Array $data, $method = "POST") {
 
-        $this->url = app('base_url').$this->endpoints["create"];
+        $this->url = app('baseUrl').$this->endpoints["create"];
 
         $this->api->callWith($this->url, $method, $data);
 
@@ -425,18 +359,15 @@ abstract class BaseBlueprint extends Resource {
             ]);
         }
 
-        Presenter::present("generics.success", [
-            // "success_description"=>"<code>".$message."</code>",
-        ]);
-    }
+        unset(Request::$request->php_admin_save);
+        echo ServicesResource::call(get_class($this), (array)Request::$request);
+        Presenter::present("generics.success", []);
 
-    protected function edit() {
-        if(!$this->editable) {
-            Presenter::present('generics.unauthorised');
-        }
+        // ServicesResource::call(get_class($this), [], 'list');
 
-        $this->url = app('base_url').$this->endpoints["show"];
-        return EditGuesser::render($this, $this->action->uid);
+        // Presenter::present("generics.success", [
+        //     // "success_description"=>"<code>".$message."</code>",
+        // ]);
     }
 
     protected function update(Array $data, $method = "PUT") {
@@ -445,37 +376,48 @@ abstract class BaseBlueprint extends Resource {
         $this->api->callWith($this->url, $method, $data);
 
         if(isset($this->api->response()->success) && $this->api->response()->success == false) {
-            Presenter::present("generics.error", [
+            return Presenter::present("generics.error", [
                 "error_info" => "Failed",
                 "error_code" => 200,
                 "error_description"=>"<code>".json_encode($this->api->response())."</code>",
             ]);
         }
+        
+        $routeDetail = ServicesResource::routeDetail($_SERVER['HTTP_REFERER']);
 
-        Presenter::present("generics.success", [
-            // "success_description"=>"<code>".json_encode($this->api->response())."</code>",
-        ]);
+        if($routeDetail->action != 'show') {
+            unset(Request::$request->php_admin_update);
+            echo ServicesResource::call(get_class($this), (array)Request::$request);
+            return Presenter::present('generics.success');
+        }
+
+        return Presenter::present("generics.update_success", []);
+
     }
 
-    protected function show() {
-        $this->url = app('base_url').$this->endpoints["show"];
+    public function show() {
+        $this->url = app('baseUrl').$this->endpoints["show"];
         return ShowGuesser::render($this, $this->action->uid);
     }
 
     protected function delete(bool $verbose = false, $method = "DELETE") {
 
         if(!$this->deleteable) {
-            Presenter::present('generics.unauthorised');
-            exit();
+            return Presenter::present('generics.unauthorised');
         }
 
-        $this->url = app('base_url').$this->endpoints["delete"];
+        $this->url = app('baseUrl').$this->endpoints["delete"];
         $this->url = preg_replace('/{id}/', $this->action->uid, $this->url);
 
         $this->api->callWith($this->url, $method);
 
-        if(!$verbose)
-            Presenter::present('generics.success');
+        if(!$verbose) {
+            unset(Request::$request->php_admin_delete);
+            echo ServicesResource::call(get_class($this), (array)Request::$request);
+            return Presenter::present('generics.success');
+        } else {
+            return ;
+        }
 
     }
 
@@ -487,7 +429,7 @@ abstract class BaseBlueprint extends Resource {
 
 
         $objects = [];
-        $this->url = app('base_url').$this->endpoints["show"];
+        $this->url = app('baseUrl').$this->endpoints["show"];
         foreach ($selected_ids as $id) {
             $url = preg_replace('/{id}/', $id, $this->url);
             $this->api->get($url);
@@ -497,7 +439,7 @@ abstract class BaseBlueprint extends Resource {
         $csv = CsvExportGuesser::render($this, $objects);
 
         echo "
-        <div class='ui icon message ". app('primary_color') ."'>
+        <div class='ui icon message ". app('primaryColor') ."'>
             <i class='download icon'></i>
             <div class='content'>
                 <div class='header'>
@@ -515,27 +457,11 @@ abstract class BaseBlueprint extends Resource {
         return $this->url;
     }
 
-    public function paginate($key) {
-        if(isset($this->paginate[$key])) {
-            return $this->paginate[$key];
+    public function edit($data) {
+        if(!$this->editable) {
+            Presenter::present('generics.unauthorised');
         }
-        return null;
-    }
-
-    public function can_paginate() {
-        return isset($this->paginate['data_field']);
-    }
-
-    public function edit_form_modal($data) {
         return EditGuesserModal::render($this, (Object) $data);
-    }
-
-    public function edit_form() {
-        return $this->edit();
-    }
-
-    public function create_form() {
-        return $this->create();
     }
 
     /**
@@ -565,12 +491,12 @@ abstract class BaseBlueprint extends Resource {
         return $this->model;
     }
 
-    private function get_name_singular() {
-        return $this->title['one'] ?  ucfirst($this->title['one']) : ucfirst($this->model);
+    public function get_name_singular() {
+        return ucfirst($this->title['one'] ?? $this->model);
     }
 
-    private function get_name_plurial() {
-        return $this->title['many'] ? ucfirst($this->title['many']) : ucfirst($this->model);
+    public function get_name_plurial() {
+        return ucfirst($this->title['many'] ?? $this->model);
     }
 }
 

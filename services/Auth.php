@@ -10,31 +10,31 @@ use function Lib\deep_walk;
 
 class Auth {
 
-    public function __construct($email = "", $password = "")
+    public static function attempt($email, $password)
     {
-
         $api = new API();
 
         $data = [
-            "email"=>Request::$request->email,
-            "password"=>Request::$request->password
+            "email"=>$email,
+            "password"=>$password
         ];
         
 
-        $url = app('base_url').app('login_endpoint');
+        $url = app('baseUrl').app('loginEndpoint');
 
-        $login_method = app('login_method');
+        $login_method = app('loginMethod');
 
         $login_method = $login_method ? $login_method : 'POST';
 
         $response = $api->callWith($url, $login_method, $data)->response();
 
-        if(deep_walk($response, 'token')) {
+        if(deep_walk($response, app('tokenKey', 'token'))) {
             $_SESSION['oauth'] = $response;
         }
 
-        if($this->user()) {
-            $this->authenticated();
+        self::user();
+        if(self::user()) {
+            self::authenticated();
         }
         
     }
@@ -55,7 +55,7 @@ class Auth {
         }
     }
 
-    public function authenticated() {
+    public static function authenticated() {
         $url = $_SERVER['REQUEST_URI'];
         Router::redirect($url);
     }

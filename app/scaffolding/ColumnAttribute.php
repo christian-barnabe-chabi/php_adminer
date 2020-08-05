@@ -28,7 +28,7 @@ class ColumnAttribute {
 
     public function __construct($column = null, $value = null)
     {
-        $primary_color = app('primary_color');
+        $primary_color = app('primaryColor');
         $column = (Object)$column;
         $this->type = isset($column->type) ? $column->type : 'text';
         $this->values = isset($column->values) ? $column->values : null;

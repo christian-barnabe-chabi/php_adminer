@@ -25,7 +25,7 @@ if(!isset($data)) $data = [];
         <?= $success_message ?>
     </div>
     <div class="actions">
-        <button onclick="$('.ui.error.modal').modal('hide'); history.back()" class="ui mini green button"> <?= Translation::translate('continue') ?> </button>
+        <button onclick="$('.ui.error.modal').modal('hide')" class="ui mini green button"> <?= Translation::translate('continue') ?> </button>
     </div>
 </div>
 
@@ -37,4 +37,4 @@ if(!isset($data)) $data = [];
     }).modal('show');
 </script>
 
-<?php  exit(); ?>
+<?php  //exit(); ?>

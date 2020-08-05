@@ -1,5 +1,6 @@
 <?php
 
+use Services\Router;
 use Services\Translation;
 
 if(!isset($data)) $data = [];
@@ -24,7 +25,7 @@ if(!isset($data)) $data = [];
         <?= $error_message ?>
     </div>
     <div class="actions">
-        <button onclick="$('.ui.error.modal').modal('hide'); history.back()" class="ui mini orange button"> <?= Translation::translate('back') ?> </button>
+        <button onclick="$('.ui.error.modal').modal('hide'); window.location.href ='<?= Router::backLink() ?>'" class="ui mini orange button"> <?= Translation::translate('back') ?> </button>
     </div>
 </div>
 

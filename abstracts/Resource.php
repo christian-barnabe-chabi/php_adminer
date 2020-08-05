@@ -15,8 +15,8 @@ abstract class Resource {
      * history back
      */
     protected function go_back() {
-        $primary_color = app('primary_color');
-        return "<a onclick='window.history.back();' class='ui butto mini $primary_color uk-button'><i class='ui left arrow icon small'></i>". Translation::translate("back") ."</a>";
+        $referer = htmlspecialchars($_SERVER['HTTP_REFERER']);
+        return "<a href='$referer' class='ui uk-button'><i class='ui left arrow icon small'></i>". Translation::translate("back") ."</a>";
     }
 }
 

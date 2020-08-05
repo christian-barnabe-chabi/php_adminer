@@ -5,7 +5,7 @@ namespace Config;
 class PublicResource {
 
     private static $routes = [
-        '/password_reset', '/logout','/login','/untracked_ticket/create', '/untracked_ticket/save', '/sme/create', '/sme/save',
+        '/password_reset', '/logout','/login', '/untracked_ticket/save', '/sme/save',
         '/mode?theme=night', '/mode?theme=light'
     ];
 

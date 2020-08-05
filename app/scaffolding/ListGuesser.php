@@ -2,7 +2,7 @@
 
 namespace App\Scaffolding;
 
-use App\Resources\BaseBlueprint;
+use Abstracts\BaseBlueprint;
 use Services\DateFormater;
 use Services\Request;
 use Services\Resource;
@@ -20,7 +20,7 @@ class ListGuesser {
 
         if(empty($blueprint->get_columns())) return null;
 
-        $primary_color = app('primary_color');
+        $primary_color = app('primaryColor');
 
         self::$blueprint = $blueprint;
         self::$columns = $blueprint->get_columns();
@@ -60,10 +60,11 @@ class ListGuesser {
         // add create button if needed
         $create_element = "";
         $create_modal_form = "";
+        $show_forms = "";
         if(self::$blueprint->createable()) {
             $create_element = "
                 <span onclick=\"$('#create_form').modal({
-                    transition: 'slide down',
+                    transition: 'fade down',
                 }).modal('show')\"
                 
                 class='ui button mini blue basic' href='/{$route}/create'>
@@ -72,13 +73,13 @@ class ListGuesser {
                 </span>
             ";
 
-            $create_modal_form = "<div class='ui modal' id='create_form'>";
+            $create_modal_form = "<div class='ui large modal' id='create_form'>";
                 $create_modal_form .= "<div class='header'>";
-                    $create_modal_form .= Translation::translate('create');
+                    $create_modal_form .= $blueprint->get_name_singular() ." | ". Translation::translate('create');
                 $create_modal_form .= "</div>";
     
                 $create_modal_form .= "<div class='content scrolling'>";
-                    $create_modal_form .= Resource::call($class, [], 'create_form');
+                    $create_modal_form .= Resource::call($class, [], 'create');
                 $create_modal_form .= "</div>";
             $create_modal_form .= "</div>";
         }
@@ -91,7 +92,7 @@ class ListGuesser {
             $delete_element = "
                 <span onclick=\"
                     $('#confirm_delete').modal({
-                        transition: 'fly down',
+                        transition: 'fly',
                     }).modal('show')\"
                 class='ui button mini orange basic' >
                 <i class=' ui icon trash'></i>
@@ -110,8 +111,8 @@ class ListGuesser {
                 $delete_modal_confirm .= "</div>";
     
                 $delete_modal_confirm .= "<div class='actions'>";
-                    $delete_modal_confirm .= "<button onclick=\"$('#multiple_delete_button').trigger('click')\" class='ui button small orange'>". Translation::translate('yes') ."</button>";
-                    $delete_modal_confirm .= "<button class='ui button small olive deny'>". Translation::translate('no') ."</button>";
+                    $delete_modal_confirm .= "<button onclick=\"$('#multiple_delete_button').trigger('click')\" class='ui button small orange'>". Translation::translate('delete') ."</button>";
+                    $delete_modal_confirm .= "<button class='ui button small olive deny'>". Translation::translate('cancel') ."</button>";
                 $delete_modal_confirm .= "</div>";
             $delete_modal_confirm .= "</div>";
         }
@@ -129,7 +130,7 @@ class ListGuesser {
         }
 
 
-        $modal_forms = "";
+        $update_modal_forms = "";
         $elements = "<div class=''>";
             // we need form for checkboxes
             $elements .= "<form class='' id='list_form' action='' method='POST'>";
@@ -162,8 +163,8 @@ class ListGuesser {
 
             $elements .="<div class='uk-overflow-auto'>";
 
-                $elements .= "<table id='table_of_resource' class='ui striped unstackable single line selectable celle table ". app('primary_color') ." compact'>";
-                // $elements .= "<table id='table_of_resource' class='ui striped celled table ". app('primary_color') ." compact'>";
+                $elements .= "<table id='table_of_resource' class='ui striped unstackable single line selectable celle table ". app('primaryColor') ." compact'>";
+                // $elements .= "<table id='table_of_resource' class='ui striped celled table ". app('primaryColor') ." compact'>";
 
                     $elements .= "<thead>";
                         $elements .= "<tr>";
@@ -212,24 +213,26 @@ class ListGuesser {
                             Request::$request->uid = $uid;
                             $row_data_id = substr(md5($uid), 0, 10);
                             
-                            $modal_forms .= "<div class='ui modal' id='$row_data_id'>";
-                                $modal_forms .= "<div class='header'>";
-                                    $modal_forms .= Translation::translate('update');
-                                $modal_forms .= "</div>";
+                            $update_modal_forms .= "<div class='ui large modal' id='$row_data_id'>";
+                                $update_modal_forms .= "<div class='header'>";
+                                    $update_modal_forms .= $blueprint->get_name_singular() ." | ". Translation::translate('update');
+                                $update_modal_forms .= "</div>";
 
-                                $modal_forms .= "<div class='content scrolling'>";
-                                    $modal_forms .= Resource::call($class, (Array)$obj, 'edit_form_modal');
-                                $modal_forms .= "</div>";
-                            $modal_forms .= "</div>";
+                                $update_modal_forms .= "<div class='content scrolling'>";
+                                    $update_modal_forms .= Resource::call($class, (Array)$obj, 'edit');
+                                $update_modal_forms .= "</div>";
+                            $update_modal_forms .= "</div>";
 
                             $delete_modal_confirm .= "<div class='ui modal mini' id='confirm_delete_$row_data_id'>";
                                 $delete_modal_confirm .= "<div class='header'>";
                                     $delete_modal_confirm .= Translation::translate('are_you_sure_to_delete');
                                 $delete_modal_confirm .= "</div>";
 
-                                $delete_modal_confirm .= "<form method='POST' class='actions' action='/{$route}/delete/{$uid}'>";
-                                    $delete_modal_confirm .= "<button onclick=\"$('#multiple_delete_button').trigger('click')\" class='ui button small orange'>". Translation::translate('yes') ."</button>";
-                                    $delete_modal_confirm .= "<button type='button' class='ui button small olive deny'>". Translation::translate('no') ."</button>";
+                                $delete_modal_confirm .= "<form method='POST' class='actions' action='/{$route}'>";
+                                    $delete_modal_confirm .= "<input name='php_admin_action' type='hidden' value='delete'>";
+                                    $delete_modal_confirm .= "<input name='php_admin_uid' type='hidden' value='$uid'>";
+                                    $delete_modal_confirm .= "<button onclick=\"$('#multiple_delete_button').trigger('click')\" class='ui button small orange'>". Translation::translate('delete') ."</button>";
+                                    $delete_modal_confirm .= "<button type='button' class='ui button small olive deny'>". Translation::translate('cancel') ."</button>";
                                 $delete_modal_confirm .= "</form>";
                             $delete_modal_confirm .= "</div>";
 
@@ -243,7 +246,12 @@ class ListGuesser {
 
                             
                             // for each column in columns
+                            // $show_forms .= "<form action='/{$route}' method='GET' id='show_$row_data_id'>
+                            //     <input type='hidden' name='php_admin_action' value='show'>
+                            //     <input type='hidden' name='php_admin_uid' value='$uid'>
+                            // </form>";
                             foreach(self::$table_columns as $column_name) {
+                                // $show_link = "onclick='$(\"#show_$row_data_id\").submit()'";
                                 $show_link = "onclick='document.location = \"/{$route}/show/{$uid}\";'";
 
                                 $cell_values = "";
@@ -412,7 +420,7 @@ class ListGuesser {
                                 if($blueprint->deleteable())
                                     $elements .= "<span onclick=\"
                                         $('#confirm_delete_$row_data_id').modal({
-                                            transition: 'fly left',
+                                            transition: 'fly',
                                         }).modal('show')\"
                                     class='uk-link-text uk-link-reset'><i class='ui icon trash orange'></i></span>";
                             $elements .= "</td>";
@@ -453,85 +461,13 @@ class ListGuesser {
 
             $elements .= "</form>";
 
-            
-            // pagination
-            if($blueprint->can_paginate() && $blueprint->paginate('last_page') != 1) {
-                if(isset(Request::$request->page))
-                    $page = Request::$request->page <= 1 ? 1 : Request::$request->page;
-                else
-                    $page = 1;
-
-                $prev = $page <= 1 ? 1 : $page-1;
-
-                $last_page = $blueprint->paginate('last_page');
-                $page_name = $blueprint->paginate('page_name') ?? 'page';
-                $count = $blueprint->paginate('count');
-
-                if(!empty($objects)) {
-                    $next = $page+1;
-                } else {
-                    $next = $page;
-                }
-
-                $elements .= "<div class='ui segment {$primary_color} right floate'>";
-
-
-                    $elements .= "<div class='ui two column very relaxed grid'>";
-
-                        $elements .= "<div class='column'>";
-                        if($count) {
-                            $elements .= "
-                                <span class='ui label $primary_color basic'>
-                                    Total: $count
-                                </span>";
-                        }
-                        $elements .= "</div>";
-
-
-                        $elements .= "<div class='column right aligned'>";
-
-                            if($page <= 1) {
-                                $elements .= "<a href='?page=$prev' class='ui button icon $primary_color circular basic mini disabled'><i class='ui icon arrow left'></i></a>";
-                            } else {
-                                $elements .= "<a href='?page=$prev' class='ui button icon $primary_color circular basic mini'><i class='ui icon arrow left'></i></a>";
-                            }
-                            $elements .= "
-                            <span class='ui tiny form'>
-                                <form class='inline field uk-inline' method='get' action='".url()."'>
-                                    <label for='paginate_to'>Page: </label>
-                                    <input type='number' min='1' max='$last_page' value='$page' id='paginate_to' name='{$page_name}' style='width: 80px;'>
-                                    <label for=''> / {$last_page} </label>
-                                    
-                                </form> 
-                            </span>";
-
-                            if($last_page) {
-                                if($page < $last_page) {
-                                    $elements .= "<a href='".url()."?{$page_name}={$next}' class='ui button icon $primary_color circular basic mini'><i class='ui icon arrow right'></i></a>";
-                                } else {
-                                    $elements .= "<a href='".url()."?{$page_name}={$next}' class='ui button icon $primary_color circular basic mini disabled'><i class='ui icon arrow right'></i></a>";
-                                } 
-                            } else {
-
-                                if(!empty($objects)) {
-                                    $elements .= "<a href='".url()."?{$page_name}={$next}' class='ui button icon $primary_color circular basic mini'><i class='ui icon arrow right'></i></a>";
-                                }
-                            
-                            }
-                        $elements .= "</div>";
-
-                        
-                    $elements .= "</div>";
-                    $elements .= "<div class='ui vertical divider'></div>";
-                $elements .= "</div>";
-            }
-
 
         $elements .= "</div>";
 
-        $elements .= $modal_forms;
+        $elements .= $update_modal_forms;
         $elements .= $create_modal_form;
         $elements .= $delete_modal_confirm;
+        $elements .= $show_forms;
         return $elements;
     }
 
@@ -575,7 +511,7 @@ class ListGuesser {
             return $elements;
         }
 
-        $cell_value = DateFormater::format(app('date_format'), $cell_value);
+        $cell_value = DateFormater::format(app('dateFormat'), $cell_value);
 
         // link
         $re1 = '/(http(s)?:\/\/)(www.)?((\w|-|_)+\.\w{2,5}(\/(\w|\?|\=|-|_)*)*)/i';

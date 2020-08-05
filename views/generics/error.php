@@ -21,6 +21,7 @@
 
 <?php
 
+use Services\Router;
 use Services\Translation;
 
     echo "<div class='ui container fluid'>
@@ -52,7 +53,7 @@ use Services\Translation;
         <?= $error_message ?>
     </div>
     <div class="actions">
-        <button onclick="$('.ui.error.modal').modal('hide'); history.back()" class="ui mini red button"> <?= Translation::translate('back') ?> </button>
+        <button onclick="$('.ui.error.modal').modal('hide'); window.location.href ='<?= Router::backLink() ?>'" class="ui mini red button"> <?= Translation::translate('back') ?> </button>
         <!-- <button onclick="$('.ui.error.modal').modal('hide')" class="ui mini yellow button"> <?= Translation::translate('cancel') ?> </button> -->
     </div>
 </div>

@@ -14,16 +14,16 @@ class Notification extends AbstractsResource {
     {
 
         $api = new API();
-        $api->header("Authorization", app('auth_type').' '.Auth::token());
+        $api->header("Authorization", app('authType').' '.Auth::token());
 
         if(isset($_POST['mark_all_as_read'])) {
             $url = "notifications/mark_all_as_read/";
-            $api->post(app('base_url').$url);
+            $api->post(app('baseUrl').$url);
         }
 
         if(isset($_POST['mark_as_read'])) {
             $url = "notifications/mark_as_read/".$_POST['mark_as_read'];
-            $api->post(app('base_url').$url);
+            $api->post(app('baseUrl').$url);
         }
 
         config('date_format', 'd/m/Y');
@@ -37,7 +37,7 @@ class Notification extends AbstractsResource {
             </form></h3>";
 
         $url = 'notifications';
-        $api->get(app('base_url').$url);
+        $api->get(app('baseUrl').$url);
 
         Presenter::present('notification', ['notifications' => $api->response()]);
     }

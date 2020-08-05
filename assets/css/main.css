@@ -35,8 +35,13 @@ html, body {
     padding-right: 4px !important;
 }
 
-* {
-    /* box-shadow: 0px 0px 0px  !important; */
+.selected_row  {
+    background-color: rgb(189, 229, 255) !important;
+    transition: all 0.2s ease-in-out;
+}
+
+.selected_row:hover  {
+    background-color: rgb(112, 210, 255) !important;
 }
 
 :not(.icon) {

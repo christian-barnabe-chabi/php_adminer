@@ -2,7 +2,7 @@
 
 namespace App\Scaffolding;
 
-use App\Resources\BaseBlueprint;
+use Abstracts\BaseBlueprint;
 use Services\API;
 use Services\Auth;
 use Lib\form\Checkbox;
@@ -14,13 +14,15 @@ class CreateGuesser {
 
     public static function render(BaseBlueprint $blueprint) {
 
-        $primary_color = app('primary_color');
+        $primary_color = app('primaryColor');
 
         $keys = array_keys($blueprint->get_columns());
 
         $resource = Request::$request->php_admin_resource;
 
-        $elements = "<form autocomplete='new-password' action='/{$resource}/save' method='POST' enctype='multipart/form-data'>";
+        $elements = "<form autocomplete='new-password' action='/{$resource}' method='POST' enctype='multipart/form-data'>";
+
+            $elements .= "<input name='php_admin_action' type='hidden' value='save'>";
 
             $elements .= "<div class='ui three column stackable grid'>";
 
@@ -92,8 +94,8 @@ class CreateGuesser {
                         }
 
                         $api = new API();
-                        $api->header("Authorization", app('auth_type').' '.Auth::token());
-                        $api->callWith(app('base_url').$column->endpoint, $column->fetch_method);
+                        $api->header("Authorization", app('authType').' '.Auth::token());
+                        $api->callWith(app('baseUrl').$column->endpoint, $column->fetch_method);
                         $sub_response = $api->response();
 
 

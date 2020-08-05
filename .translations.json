@@ -24,12 +24,12 @@
         "en": "Save"
     },
     "update": {
-        "fr": "Mettre à jour",
+        "fr": "Mise à jour",
         "en": "Update"
     },
     "back": {
         "fr": "Retour",
-        "en": "back"
+        "en": "Back"
     },
     "logout": {
         "fr": "Déconnexion",
@@ -47,7 +47,7 @@
         "fr": "Cliquer pour aperçu",
         "en": "Click to preview"
     },
-    "list_of": {
+    "list": {
         "fr": "Liste",
         "en": "List"
     },
@@ -55,12 +55,16 @@
         "fr": "Mode",
         "en": "Mode"
     },
+    "night_mode": {
+        "fr": "Mode sombre",
+        "en": "Night mode"
+    },
     "light": {
-        "fr": "Jour",
+        "fr": "Clair",
         "en": "Light"
     },
     "night": {
-        "fr": "Nuit",
+        "fr": "Sombre",
         "en": "Night"
     },
     "multiple_delete": {
@@ -348,8 +352,8 @@
         "en": "My notifications"
     },
     "field required": {
-        "fr": "Champ requis",
-        "en": "Required field"
+        "fr": "Obligatoire",
+        "en": "Required"
     },
     "about": {
         "fr": "A propos",
@@ -420,8 +424,8 @@
         "en": "Please, select on or more lines to apply this action"
     },
     "are_you_sure_to_delete": {
-        "fr": "Êtes-vous sûr?",
-        "en": "Are you sure?"
+        "fr": "Confirmez",
+        "en": "Confirm"
     },
     "guest": {
         "fr": "Invité",

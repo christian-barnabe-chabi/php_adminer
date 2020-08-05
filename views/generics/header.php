@@ -5,7 +5,7 @@ use Services\Auth;
 use Services\Resource;
 use Services\Translation;
 
-    $primary_color = app('primary_color');
+    $primary_color = app('primaryColor');
     $inverted = app('colorful') ? 'inverted' : '';
     $bg_white = empty($inverted)  ? 'background: white' : '';
 ?>
@@ -19,9 +19,9 @@ use Services\Translation;
                     <img class="ui middle aligned mini image squared" src="<?= app('icon') ?>">
                 <?php endif; ?>
 
-                <?php if(app('app_name')): ?>
+                <?php if(app('appName')): ?>
                     <h3 class="ui aligned middle uk-margin-remove" style="display: inline-block !important; color: <?= app('colorful') ? 'white' : 'grey' ?>;">
-                    <?= app('app_name') ?>
+                    <?= app('appName') ?>
                     </h3>
                 <?php else: ?>
                     <h3 class="ui aligned middle uk-margin-remove" style="display: inline-block !important; color: <?= app('colorful') ? 'white' : 'grey' ?>;">
@@ -35,13 +35,12 @@ use Services\Translation;
 
     <nav class="ui right menu secondary uk-padding-small">
 
-        <span class="item ui dropdown">
-            <?= ucfirst(Translation::translate('_mode')) ?> : <?= ucfirst(Translation::translate(app('theme', 'light'))) ?>
-            <div class="ui menu">
-                <a href="/mode?theme=night" class="item"><?= ucfirst( Translation::translate('night')) ?></a>
-                <a href="/mode?theme=light" class="item"><?= ucfirst( Translation::translate('light')) ?></a>
+        <div class="item uk-margin-remove uk-padding-remove">
+            <label><?= Translation::translate('night_mode') ?></label>
+            <div class="ui toggle fitted tiny checkbox uk-margin-left" id="selected-theme">
+                <input type="checkbox" name="public">
             </div>
-        </span>
+        </div>
 
 <?php
 
@@ -77,7 +76,7 @@ if(!empty(Auth::user())):
                                     <br>
                                     <small class='ui subtitle'><?= Auth::user()->email ?? 'user@example.com' ?></small>
                                     <br>
-                                    <small class='ui label tiny subtitle'><?= Auth::user()->role ?? 'admin account' ?></small>
+                                    <small class='ui label tiny subtitle'><?= Auth::user()->role_ ?? 'admin account' ?></small>
                                 </div>
                             </div>
                         </div>
@@ -94,7 +93,7 @@ if(!empty(Auth::user())):
 
         <?php 
             else:
-                if(!app('must_auth')):
+                if(!app('mustAuth')):
         ?>
 
             <!-- if not loged in -->
@@ -111,7 +110,7 @@ if(!empty(Auth::user())):
 <div id="underHeader"></div>
 
 <?php
-    if(app('must_auth'))
+    if(app('mustAuth'))
     {
         if(Auth::user()) {
             new MenuScaffold();

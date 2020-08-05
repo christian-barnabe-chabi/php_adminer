@@ -2,7 +2,7 @@
 
 namespace App\Scaffolding;
 
-use App\Resources\BaseBlueprint;
+use Abstracts\BaseBlueprint;
 use Services\API;
 use Services\Auth;
 use Lib\form\Checkbox;
@@ -20,7 +20,7 @@ class EditGuesser {
 
         // fetch data
         $api = new API();
-        $api->header("Authorization", app('auth_type').' '.Auth::token());
+        $api->header("Authorization", app('authType').' '.Auth::token());
         $response = $api->get($url)->response();
 
         if(is_array($response)) {
@@ -119,7 +119,7 @@ class EditGuesser {
                                         if($column->image) {
 
                                             if(!preg_match("/(http(s)?:\/\/)?(www.)?.\w{2,6}/i", $old_value)) {
-                                                $old_value = preg_replace('/$\//', '', app('base_url')) .'/'. preg_replace('/^\//', '', $old_value);  
+                                                $old_value = preg_replace('/$\//', '', app('baseUrl')) .'/'. preg_replace('/^\//', '', $old_value);  
                                             }
 
                                             $label  = "<label for='".$value."' uk-lightbox>".$column->name.$required_indicator."<small> (<a href='$old_value'>". Translation::translate('click_to_preview') .")</a></small></label>";
@@ -140,8 +140,8 @@ class EditGuesser {
                         }
 
                         $api = new API();
-                        $api->header("Authorization", app('auth_type').' '.Auth::token());
-                        $api->callWith(app('base_url').$column->endpoint, $column->fetch_method);
+                        $api->header("Authorization", app('authType').' '.Auth::token());
+                        $api->callWith(app('baseUrl').$column->endpoint, $column->fetch_method);
                         $sub_response = $api->response();
 
 
@@ -333,7 +333,7 @@ class EditGuesser {
                     $image = '';
                     if($column->image) {
                         if(!preg_match("/(http(s)?:\/\/)?(www.)?.\w{2,6}/i", $old_value)) {
-                            $old_value = preg_replace('/$\//', '', app('base_url')) .'/'. preg_replace('/^\//', '', $old_value);  
+                            $old_value = preg_replace('/$\//', '', app('baseUrl')) .'/'. preg_replace('/^\//', '', $old_value);  
                         }
                         $label  = "<label for='".$value."' uk-lightbox>".$column->name.$required_indicator."<small> (<a href='$old_value'>". Translation::translate('click_to_preview') .")</a></small></label>";
                     }

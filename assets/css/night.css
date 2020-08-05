@@ -3,6 +3,16 @@
     --secondary-dark:   rgb(41, 41, 41);
 }
 
+
+* {
+    transition: background 0.2s linear;
+}
+
+.selected_row  {
+    background-color: rgb(189, 229, 255) !important;
+    transition: all 0.2s ease-in-out;
+}
+
 #topNavbar, #topNavbar * > * {
     background-color: var(--primary-dark) !important;
     color: white !important;
@@ -12,7 +22,7 @@
     color: rgb(179, 179, 179);
 }
 
-body, html,  #main-container {
+body, html {
     background-color: var(--secondary-dark) !important;
     color: white !important;
 }
