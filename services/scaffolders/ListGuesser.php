@@ -449,9 +449,9 @@ class ListGuesser {
                     </div>
                     <select class="ui dropdown compact" id="per_page_field" style="text-align: center; font-size: 1.6em; border: none !important;">
                         <option value="5">05</option>
-                        <option value="10" selected>10</option>
+                        <option value="10">10</option>
                         <option value="20">20</option>
-                        <option value="30">30</option>
+                        <option value="30" selected>30</option>
                         <option value="50">50</option>
                         <option value="80">80</option>
                         <option value="100">100</option>
