@@ -13,7 +13,7 @@ class Route {
             $method = $resource[1];
         }
         
-        $req_path = strtolower($_SERVER['REQUEST_URI']) ?? '';
+        $req_path = strtolower($_SERVER['REQUEST_URI'] ?? '');
         
         if(preg_match($pattern, $req_path, $matches)) {
             

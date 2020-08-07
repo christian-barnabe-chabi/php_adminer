@@ -19,10 +19,11 @@ spl_autoload_register(function($class_name) {
     if(file_exists($_SERVER['DOCUMENT_ROOT'].'/'.$class_name.'.php')) {
         require_once( $_SERVER['DOCUMENT_ROOT'].'/'.$class_name.'.php' );
     } else {
+        $path = $_SERVER['DOCUMENT_ROOT'].'/'.$class_name.'.php';
         Presenter::present("generics.error", [
             "error_info" => Translation::translate('class_not_found'),
             "error_code" => 1736,
-            "error_description"=> Translation::translate('the_class')." '".$class_name."' ".Translation::translate('is_not_found')
+            "error_description"=> Translation::translate('the_class')." '".$path."' ".Translation::translate('is_not_found')
         ]);
         exit('Exit');
     }

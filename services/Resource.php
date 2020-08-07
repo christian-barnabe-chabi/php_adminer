@@ -124,39 +124,28 @@ class Resource
         $resource_class = ucwords($resource_class);
         $resource_class = str_replace(' ', '', $resource_class);
 
-
-        if (class_exists($resource_class, false)) {
             
-            self::$resource = new $resource_class();
+        self::$resource = new $resource_class();
 
-            if (method_exists(self::$resource, 'get_model_name')) {
-                self::$page_title = self::$resource->get_model_name().' | ';
-            } else {
-                self::$page_title = Translation::translate($resource).' | ';
-            }
-    
-            self::$page_title = str_replace('_', ' ', self::$page_title);
-            self::$page_title = ucfirst(strtolower(self::$page_title));
-
-            $handler = self::$handle_methode_name;
-            if (method_exists(self::$resource, $handler)) {
-                self::$resource->$handler($data);
-            } else {
-                Presenter::present("generics.error", [
-                    "error_info" => Translation::translate('failure'),
-                    "error_code" => 87,
-                    "error_description"=>Translation::translate('the_class')."'". get_class(self::$resource) ."' ". Translation::translate('must_implement_method') ." '".self::$handle_methode_name."'"
-                ]);
-            }
+        if (method_exists(self::$resource, 'get_model_name')) {
+            self::$page_title = self::$resource->get_model_name().' | ';
         } else {
-            self::open_tags();
+            self::$page_title = Translation::translate($resource).' | ';
+        }
+
+        self::$page_title = str_replace('_', ' ', self::$page_title);
+        self::$page_title = ucfirst(strtolower(self::$page_title));
+
+        $handler = self::$handle_methode_name;
+        if (method_exists(self::$resource, $handler)) {
+            self::$resource->$handler($data);
+        } else {
             Presenter::present("generics.error", [
                 "error_info" => Translation::translate('failure'),
-                "error_code" => 90,
-                "error_description"=> Translation::translate('resource_not_found')." '".$resource_class."'"
+                "error_code" => 87,
+                "error_description"=>Translation::translate('the_class')."'". get_class(self::$resource) ."' ". Translation::translate('must_implement_method') ." '".self::$handle_methode_name."'"
             ]);
-            self::close_tags();
-        };
+        }
         
         self::render();
         // exit();
@@ -166,30 +155,19 @@ class Resource
     {
 
         self::$handle_methode_name = $handle_methode_name;
-
-        if (class_exists($resource, false)) {
             
-            self::$resource = new $resource();
+        self::$resource = new $resource();
 
-            $handler = self::$handle_methode_name;
-            if (method_exists(self::$resource, $handler)) {
-                return self::$resource->$handler($data);
-            } else {
-                Presenter::present("generics.error", [
-                    "error_info" => Translation::translate('failure'),
-                    "error_code" => 87,
-                    "error_description"=>Translation::translate('the_class')."'". get_class(self::$resource) ."' ". Translation::translate('must_implement_method') ." '".self::$handle_methode_name."'"
-                ]);
-            }
+        $handler = self::$handle_methode_name;
+        if (method_exists(self::$resource, $handler)) {
+            return self::$resource->$handler($data);
         } else {
-            self::open_tags();
             Presenter::present("generics.error", [
                 "error_info" => Translation::translate('failure'),
-                "error_code" => 90,
-                "error_description"=> Translation::translate('resource_not_found')." '".$resource."'"
+                "error_code" => 87,
+                "error_description"=>Translation::translate('the_class')."'". get_class(self::$resource) ."' ". Translation::translate('must_implement_method') ." '".self::$handle_methode_name."'"
             ]);
-            self::close_tags();
-        };
+        }
     }
 
     public static function routeDetail($route) {

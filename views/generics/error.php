@@ -49,7 +49,7 @@ use Services\Translation;
          <?= Translation::translate('error') .' '. $data['error_code'] .' - '. $data['error_info'] ?>
     </div>
     <div class="content">
-        <?= app('debug') ? '<code>'.$data['url'].'</code><br>' : '' ?>
+        <?= app('debug') && isset($data['url']) ? '<code>'.$data['url'].'</code><br>' : '' ?>
         <?= $error_message ?>
     </div>
     <div class="actions">

@@ -35,18 +35,19 @@ class Router {
     }
 
     public static function backLink() {
-        if($_SERVER['HTTP_REFERER']) {
+        if(isset($_SERVER['HTTP_REFERER'])) {
             return htmlspecialchars($_SERVER['HTTP_REFERER']);
         }
         return '/';
     }
 
     public static function back() {
-        if($_SERVER['HTTP_REFERER']) {
+        if(isset($_SERVER['HTTP_REFERER'])) {
             header("location:{$_SERVER['HTTP_REFERER']}");
             // echo "<meta http-equiv = 'refresh' content = '0; url = {$_SERVER['HTTP_REFERER']}' />";
             exit();
         }
+        return '/';
     }
 }
 

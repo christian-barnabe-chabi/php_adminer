@@ -9,7 +9,7 @@ Class Authenticateable {
         // TODO cache the incomming request
 
         if(!Auth::user()) {
-            Resource::load('App\Providers\Login');
+            Resource::load('App\Managers\Login');
             exit();
         }
     }
