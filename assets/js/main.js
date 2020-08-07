@@ -46,10 +46,10 @@ $(document).ready(() => {
             // tableSearchable.search()
         })
         
-        $('#search_value').on('keydown', ()=> {
-            all_checked = false;
-            $('#check_all_objcts').prop('checked', false);
-        })
+        //$('#search_value').on('keydown', ()=> {
+        //    all_checked = false;
+        //    $('#check_all_objcts').prop('checked', false);
+        //})
 
     } catch (error) {
         console.error(error)
