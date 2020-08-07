@@ -18,7 +18,7 @@
     src : url('/assets/fonts/Montserrat-Regular.ttf');
 }
 
-.ui.menu.fixed .item:first-child, .ui.menu.fixed .item:last-child, .ui.menu:not(.pagination) .item {
+.ui.menu.fixed .item:first-child, .ui.menu.fixed .item:last-child, .ui.menu:not(.pagination) .item, .ui.secondary.vertical.menu>.item {
     border-radius: 50px !important;
 }
 

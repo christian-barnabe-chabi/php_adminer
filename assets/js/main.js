@@ -159,7 +159,7 @@ $(document).ready(() => {
     if(x.length != 0) {
         var top = x.position().top;
         x.offsetParent().animate({
-            scrollTop: top+'px'
+            scrollTop: (top-15)+'px'
         });
     }
 
