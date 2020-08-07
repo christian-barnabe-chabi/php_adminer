@@ -2,8 +2,8 @@
 
 use Services\Route;
 
-Route::intercept('/dashboard(\w)*/', "App\Providers\Dashboard@handle");
-Route::intercept('/logout(\w)*/', "App\Providers\Logout@handle");
-Route::intercept('/login(\w)*/', "App\Providers\Login@handle");
+Route::intercept('/dashboard/', "App\Managers\Dashboard@handle");
+Route::intercept('/logout/', "App\Managers\Logout@handle");
+Route::intercept('/login*/', "App\Managers\Login@handle");
 
 ?>

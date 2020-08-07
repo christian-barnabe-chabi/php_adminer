@@ -51,7 +51,7 @@ if(!empty(Auth::user())):
             }
             
         ?>
-            <a href="<?= Resource::link('notification') ?>" class="item ui floating tiny button icon circular" style="margin: 0px;">
+            <a href="#" class="item ui floating tiny button icon circular" style="margin: 0px;">
                 <i class="ui bell outline large icon"></i>
                 <span class="ui floating circular basic mini label <?= $primary_color ?>">0</span>
             </a>

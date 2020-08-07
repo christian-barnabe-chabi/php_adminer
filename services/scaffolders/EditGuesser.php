@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Scaffolding;
+namespace Services\Scaffolders;
 
 use Abstracts\BaseBlueprint;
 use Services\API;
@@ -10,7 +10,7 @@ use Lib\form\Dropdown;
 use Services\Request;
 use Services\Translation;
 
-class EditGuesserModal {
+class EditGuesser {
 
     public static function render(BaseBlueprint $blueprint, $data) {
 
@@ -365,7 +365,7 @@ class EditGuesserModal {
             $elements .= "</div>";
 
             $elements .= "<div class='uk-margin uk-text-right'>";
-                $elements .= "<button class='ui button yellow small' type='submit'><i class='ui icon check'></i>". Translation::translate("save") ."</button>";
+                $elements .= "<button class='ui button blue small' type='submit'><i class='ui icon check'></i>". Translation::translate("save") ."</button>";
             $elements .= "</div>";
 
 

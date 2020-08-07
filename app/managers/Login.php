@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Providers;
+namespace App\Managers;
 
 use Abstracts\Resource;
 use Services\Auth;

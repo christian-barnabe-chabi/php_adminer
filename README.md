@@ -1,5 +1,10 @@
 > # PHP ADMINER, Your API, Your rules
 
+```
+This documentation is not up to date - The correct documentation is comming soon
+```
+
+
 ### About "PHP ADMINER"
 
 "PHP ADMINER" is an admin panel generator fully made in PHP. It generate the views based on the responses sent by your api. That means, "PHP ADMINER" is not a part of you api. So create your API using any language or framework, and scaffold your CRUD view in no time.

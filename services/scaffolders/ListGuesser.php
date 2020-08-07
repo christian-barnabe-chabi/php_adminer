@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Scaffolding;
+namespace Services\Scaffolders;
 
 use Abstracts\BaseBlueprint;
 use Services\DateFormater;
@@ -64,11 +64,11 @@ class ListGuesser {
         if(self::$blueprint->createable()) {
             $create_element = "
                 <span onclick=\"$('#create_form').modal({
-                    transition: 'fade down',
+                    transition: 'drop down',
                 }).modal('show')\"
                 
-                class='ui button mini blue basic' href='/{$route}/create'>
-                    <i class=' ui icon pencil'></i>
+                class='ui button mini blue ' href='/{$route}/create'>
+                    <i class=' ui icon plus'></i>
                     ". Translation::translate("create") ."
                 </span>
             ";
@@ -94,7 +94,7 @@ class ListGuesser {
                     $('#confirm_delete').modal({
                         transition: 'fly',
                     }).modal('show')\"
-                class='ui button mini orange basic' >
+                class='ui button mini orange' >
                 <i class=' ui icon trash'></i>
                     ". Translation::translate("delete") ."
                 </span>
@@ -122,7 +122,7 @@ class ListGuesser {
         $export_element = "";
         if(self::$blueprint->exportable()) {
             $export_element = "
-                <button name='php_admin_export' value='' class='ui button mini teal basic' >
+                <button name='php_admin_export' value='' class='ui button mini yellow' >
                     <i class=' ui icon save'></i>
                     ". Translation::translate("export") ."
                 </button>
@@ -137,7 +137,7 @@ class ListGuesser {
 
             // search and delete and export
             $elements .= "
-                <div class='ui segment $primary_color'>
+                <div class='ui segment'>
                     <div class='ui two column grid stackable'>
                         <div class='column'>
                             <div class='ui left labeled input mini'>
@@ -163,7 +163,7 @@ class ListGuesser {
 
             $elements .="<div class='uk-overflow-auto'>";
 
-                $elements .= "<table id='table_of_resource' class='ui striped unstackable single line selectable celle table ". app('primaryColor') ." compact'>";
+                $elements .= "<table id='table_of_resource' class='ui unstackable single line table compact'>";
                 // $elements .= "<table id='table_of_resource' class='ui striped celled table ". app('primaryColor') ." compact'>";
 
                     $elements .= "<thead>";
@@ -439,7 +439,7 @@ class ListGuesser {
 
             $elements .= <<<EOT
                 <div class="ui pagination mini menu uk-margin-top">
-                    <a class="active item" id="paginator_prev"> <i class="ui chevron left icon"></i> </a>
+                    <a class="item" id="paginator_prev"> <i class="ui chevron left icon"></i> </a>
                     <div class="item ui mini transparent input" style="padding: 0px !important; margin: 0px !important;">
                         <input type="number" id="current_page_field" value="1" style="text-align: center; font-size: 1.6em; width: 60px;">
                     </div>
@@ -447,15 +447,16 @@ class ListGuesser {
                     <div class="item ui mini transparent input" style="padding: 0px !important; margin: 0px !important;">
                         <input type="text" disabled id="last_page_field" value="" style="text-align: center; font-size: 1.6em; width: 60px;">
                     </div>
-                    <select class="ui dropdown compact" id="per_page_field" style="text-align: center; font-size: 1.6em;">
-                        <option value="5">5</option>
+                    <select class="ui dropdown compact" id="per_page_field" style="text-align: center; font-size: 1.6em; border: none !important;">
+                        <option value="5">05</option>
                         <option value="10" selected>10</option>
-                        <option value="15">15</option>
                         <option value="20">20</option>
-                        <option value="25">25</option>
                         <option value="30">30</option>
+                        <option value="50">50</option>
+                        <option value="80">80</option>
+                        <option value="100">100</option>
                     </select>
-                    <a class="active item" id="paginator_next"> <i class="ui chevron right icon"></i> </a>
+                    <a class="item" id="paginator_next"> <i class="ui chevron right icon"></i> </a>
                 </div>
             EOT;
 

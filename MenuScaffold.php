@@ -1,6 +1,6 @@
 <?php
 
-use App\Scaffolding\ResourceScaffold;
+use Services\Scaffolders\ResourceScaffold;
 use Services\Auth;
 use Services\Resource;
 
@@ -9,7 +9,7 @@ class MenuScaffold {
 
         /**
          * @param str resource_name
-         * @param str match
+         * @param str route
          * @param str icon (semantic ui icon class)
          */
 		ResourceScaffold::define('Dashboard', 'dashboard', 'tachometer alternate');

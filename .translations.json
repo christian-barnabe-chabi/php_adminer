@@ -79,6 +79,14 @@
         "fr": "La classe de ressource introuvable pour",
         "en": "No resource class found for"
     },
+    "class_not_found": {
+        "fr": "Classe introuvable",
+        "en": "Class not found"
+    },
+    "is_not_found": {
+        "fr": "est introuvable",
+        "en": "is not found"
+    },
     "not_found_api": {
         "fr": "Page introuvable",
         "en": "Page not found"

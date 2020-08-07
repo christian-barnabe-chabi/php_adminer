@@ -2,12 +2,11 @@
 namespace Abstracts;
 
 use Abstracts\Resource;
-use App\Scaffolding\CreateGuesser;
-use App\Scaffolding\CsvExportGuesser;
-use App\Scaffolding\EditGuesser;
-use App\Scaffolding\EditGuesserModal;
-use App\Scaffolding\ListGuesser;
-use App\Scaffolding\ShowGuesser;
+use Services\Scaffolders\CreateGuesser;
+use Services\Scaffolders\CsvExportGuesser;
+use Services\Scaffolders\EditGuesser;
+use Services\Scaffolders\ListGuesser;
+use Services\Scaffolders\ShowGuesser;
 use Config\PublicResource;
 use Exception;
 use Services\API;
@@ -461,7 +460,7 @@ abstract class BaseBlueprint extends Resource {
         if(!$this->editable) {
             Presenter::present('generics.unauthorised');
         }
-        return EditGuesserModal::render($this, (Object) $data);
+        return EditGuesser::render($this, (Object) $data);
     }
 
     /**

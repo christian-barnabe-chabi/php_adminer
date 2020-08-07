@@ -8,11 +8,6 @@
     transition: background 0.2s linear;
 }
 
-.selected_row  {
-    background-color: rgb(189, 229, 255) !important;
-    transition: all 0.2s ease-in-out;
-}
-
 #topNavbar, #topNavbar * > * {
     background-color: var(--primary-dark) !important;
     color: white !important;
@@ -74,13 +69,23 @@ input[type=checkbox], input[type=radio] {
     color: white !important;
 }
 
+.ui.pagination {
+    background-color: var(--secondary-dark) !important;
+    color: white !important;
+}
+
+.ui.pagination .item, .ui.pagination .dropdown {
+    background-color: var(--primary-dark) !important;
+    color: white !important;
+    border-radius: 0px !important;
+}
+
 #side-menu .item {
     background-color: transparent !important;
 }
 
 .menu .item > input, .ui.dropdown, .ui.menu .ui.dropdown .menu>.item, .ui.menu .ui.dropdown .menu>.active.item {
     border: none !important;
-    border-radius: 0px !important;
     color: white !important;
 }
 
@@ -98,12 +103,15 @@ input {
 
 .ui.table>thead, .ui.table>thead tr th, .ui.table>thead tr td, tr th  {
     background-color: var(--primary-dark) !important;
-    /* background-color: var(--secondary-dark) !important; */
     color: white !important;
 }
 
 .ui.table>tbody, .ui.table>tbody tr th, .ui.table>tbody tr td  {
     background-color: var(--secondary-dark) !important;
-    /* background-color: var(--primary-dark) !important; */
     color: white;
+}
+
+.selected_row  {
+    background-color: rgb(189, 229, 255) !important;
+    transition: all 0.2s ease-in-out;
 }

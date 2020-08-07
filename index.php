@@ -16,7 +16,7 @@ if(app('mustAuth') && !in_array($_SERVER['REQUEST_URI'], PublicResource::routes(
     Authenticateable::auth();
 } else {
     if(!isset(Request::$request->php_admin_resource)) {
-        Resource::load(app('entrypoint'));
+        Resource::load(app('entrypoint', 'dashboard'));
     }
 }
 

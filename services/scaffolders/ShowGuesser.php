@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Scaffolding;
+namespace Services\Scaffolders;
 
 use Abstracts\BaseBlueprint;
 use Services\API;
@@ -63,7 +63,7 @@ class ShowGuesser {
                 $_key = plurial_noun(ucfirst(str_replace('_',' ', $_key)));
 
                 $widget_content .= "<div class='ui segment blueprint-show'>";
-                $widget_content .= "<h5><i class='ui hand point right icon'></i>$_key</h5>";
+                $widget_content .= "<h5 class='ui header dividing'>$_key</h5>";
 
                 $sample = $value[0];
 
@@ -158,7 +158,7 @@ class ShowGuesser {
                 $_key = ucfirst(str_replace('_',' ', $_key));
 
                 $widget_content .= "<div class='ui segment blueprint-show'>";
-                $widget_content .= "<h5><i class='ui hand point right icon'></i>$_key</h5>";
+                $widget_content .= "<h5 class='ui header dividing'>$_key</h5>";
 
                 $sub_body = "";
 
@@ -333,7 +333,7 @@ class ShowGuesser {
                             transition: 'fly',
                         }).modal('show')\"
                     
-                    class='ui button mini orange basic' >
+                    class='ui button mini orange' >
                     <i class=' ui icon trash'></i>
                     ". Translation::translate("delete") ."
                 </span>
@@ -364,7 +364,7 @@ class ShowGuesser {
                     $('#$modal_data_id').modal({
                         transition: 'drop',
                     }).modal('show')\"
-                href='/{$resource}/edit/{$uid}' class='ui button mini blue basic' >
+                href='/{$resource}/edit/{$uid}' class='ui button mini blue' >
                     <i class=' ui icon pencil'></i>
                     ". Translation::translate("edit") ."
                 </span>
@@ -389,7 +389,7 @@ class ShowGuesser {
             $export_element = "
                 <form action='/{$resource}' method='POST' class='uk-display-inline'>
                     <input type='hidden' name='php_admin_export'>
-                    <button name='selected_id[]' value='{$uid}' type='submit' class='ui button mini teal basic' >
+                    <button name='selected_id[]' value='{$uid}' type='submit' class='ui button mini yellow' >
                         <i class='ui icon save'></i>
                         ". Translation::translate("export") ."
                     </button>
@@ -402,7 +402,7 @@ class ShowGuesser {
         $element = "";
         if($blueprint->editable() OR $blueprint->deleteable() OR $blueprint->exportable()) {
             $element .= "
-                <div class='ui segment $primary_color'>
+                <div class='ui segment'>
                     <div class='ui two column grid stackable'>
                         <div class='column'>
                             
@@ -433,7 +433,7 @@ class ShowGuesser {
 
             $element .= "<div class='column nine wide'>";
                     $element .= "<div class='ui segment blueprint-show'>";
-                    $element .= "<h5><i class='ui hand point right icon'></i>". Translation::translate('direct_attached_data') ."</h5>";
+                    $element .= "<h5 class='ui header dividing'>". Translation::translate('direct_attached_data') ."</h5>";
                     $head = ''; //"<tr><th class='collapsing'>". Translation::translate('key') ."</th><th>". Translation::translate('value') ."</th></tr>";
                     $element .= self::make_table($head, $primary_widget, '800px', false);
                     $element .= "</div>";
@@ -467,7 +467,7 @@ class ShowGuesser {
 
         $element .= "<div class='uk-overflow-auto' style='max-height:$max_height'>";
         // $element .= "<table id='show_tables' class='ui $primary_color selectable celled striped single line table compact'>";
-            $element .= "<table id='show_tables' class='ui $primary_color selectable celled striped {$single_line} table compact'>";
+            $element .= "<table id='show_tables' class='ui selectable celled striped {$single_line} table compact'>";
 
                 $element .= "<thead>";
                     $element .= $head; // tr.th

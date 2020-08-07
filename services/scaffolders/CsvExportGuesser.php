@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Scaffolding;
+namespace Services\Scaffolders;
 
 use Abstracts\BaseBlueprint;
 use Exception;

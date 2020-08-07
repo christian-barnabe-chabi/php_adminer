@@ -15,8 +15,9 @@ abstract class Resource {
      * history back
      */
     protected function go_back() {
-        $referer = htmlspecialchars($_SERVER['HTTP_REFERER']);
-        return "<a href='$referer' class='ui uk-button'><i class='ui left arrow icon small'></i>". Translation::translate("back") ."</a>";
+        return "<a onclick='history.back()' class='ui uk-button'><i class='ui left arrow icon small'></i>". Translation::translate("back") ."</a>";
+        // $referer = htmlspecialchars($_SERVER['HTTP_REFERER']);
+        // return "<a href='$referer' class='ui uk-button'><i class='ui left arrow icon small'></i>". Translation::translate("back") ."</a>";
     }
 }
 

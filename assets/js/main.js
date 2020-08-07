@@ -2,6 +2,9 @@ $(document).ready(() => {
     init();
     auto_fix();
 
+    var checkboxes = $('.selected_ids');
+
+
     if(localStorage.getItem('mode') == 'night') {
         $('#selected-theme').checkbox('check')
     } else {
@@ -29,6 +32,7 @@ $(document).ready(() => {
         console.error(error)
     }
 
+    // search
     try {
         tableSearchable = new TableSearchable(myTable, '', $('#search_value'))
 
@@ -40,6 +44,11 @@ $(document).ready(() => {
         $('#search_in').on('change', (e)=> {
             tableSearchable.column = $('#search_in').val()
             // tableSearchable.search()
+        })
+        
+        $('#search_value').on('keydown', ()=> {
+            all_checked = false;
+            $('#check_all_objcts').prop('checked', false);
         })
 
     } catch (error) {
@@ -75,7 +84,7 @@ $(document).ready(() => {
     })
 
     $('#check_all_objcts').on('click', (event)=> {
-        let checkboxes = $('.selected_ids');
+        // let checkboxes = $('.selected_ids');
         
         all_checked = !all_checked;
 

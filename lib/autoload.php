@@ -4,6 +4,7 @@ namespace Lib;
 
 use Services\Presenter;
 use Services\Request;
+use Services\Translation;
 
 spl_autoload_register(function($class_name) {
     $class_name = str_replace("\\", DIRECTORY_SEPARATOR, $class_name);
@@ -15,14 +16,19 @@ spl_autoload_register(function($class_name) {
 
     $class_name = implode(DIRECTORY_SEPARATOR, $class_name);
 
-    if(!require_once( $_SERVER['DOCUMENT_ROOT'].'/'.$class_name.'.php' )){
-        echo "Can't include";
+    if(file_exists($_SERVER['DOCUMENT_ROOT'].'/'.$class_name.'.php')) {
+        require_once( $_SERVER['DOCUMENT_ROOT'].'/'.$class_name.'.php' );
+    } else {
+        Presenter::present("generics.error", [
+            "error_info" => Translation::translate('class_not_found'),
+            "error_code" => 1736,
+            "error_description"=> Translation::translate('the_class')." '".$class_name."' ".Translation::translate('is_not_found')
+        ]);
+        exit('Exit');
     }
 
 });
 
-include_files_in("app/providers");
-include_files_in("app/resources");
 include_files_in("lib");
 include_files_in("config");
 

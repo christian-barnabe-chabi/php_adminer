@@ -3,6 +3,7 @@
 namespace Services;
 
 use Services\Presenter;
+use Throwable;
 
 use function Lib\plurial_noun;
 
@@ -15,46 +16,33 @@ class Resource
 
     public static function load(string $resource_class, array $data = [], $handle_methode_name = 'handle')
     {
-        
-        if (class_exists($resource_class, false)) {
-            
-            $data = array_merge((Array)Request::$request, $data);
+        $data = array_merge((Array)Request::$request, $data);
 
-            self::$resource = new $resource_class($data);
+        self::$resource = new $resource_class($data);
 
-            if (method_exists(self::$resource, 'get_model_name')) {
-                self::$page_title = self::$resource->get_model_name() .' | ';
-            } else {
-                self::$page_title = Request::$request->php_admin_resource ? Translation::translate(Request::$request->php_admin_resource).' | ' : ' ';
-            }
-    
-            self::$page_title = str_replace('_', ' ', self::$page_title);
-            self::$page_title = ucfirst(self::$page_title);
-            self::open_tags();
-
-            $handler = self::$handle_methode_name;
-            if ($handler && method_exists(self::$resource, $handler)) {
-                self::$resource->$handler($data);
-                self::close_tags();
-            } else {
-                Presenter::present("generics.error", [
-                    "error_info" => Translation::translate('failure'),
-                    "error_code" => 87,
-                    "error_description"=>Translation::translate('the_class')."'". get_class(self::$resource) ."' ". Translation::translate('must_implement_method') ." '".self::$handle_methode_name."'"
-                ]); 
-                self::close_tags();
-            }
+        if (method_exists(self::$resource, 'get_model_name')) {
+            self::$page_title = self::$resource->get_model_name() .' | ';
         } else {
-            self::open_tags();
+            self::$page_title = Request::$request->php_admin_resource ? Translation::translate(Request::$request->php_admin_resource).' | ' : ' ';
+        }
+
+        self::$page_title = str_replace('_', ' ', self::$page_title);
+        self::$page_title = ucfirst(self::$page_title);
+        self::open_tags();
+
+        $handler = self::$handle_methode_name;
+        if ($handler && method_exists(self::$resource, $handler)) {
+            self::$resource->$handler($data);
+            self::close_tags();
+        } else {
             Presenter::present("generics.error", [
                 "error_info" => Translation::translate('failure'),
-                "error_code" => 90,
-                "error_description"=> Translation::translate('resource_not_found')." '".$resource_class."'"
-            ]);
+                "error_code" => 87,
+                "error_description"=>Translation::translate('the_class')."'". get_class(self::$resource) ."' ". Translation::translate('must_implement_method') ." '".self::$handle_methode_name."'"
+            ]); 
             self::close_tags();
-        };
+        }
         self::close_tags();
-        // self::render();
         exit();
     }
 

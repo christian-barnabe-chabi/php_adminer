@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Scaffolding;
+namespace Services\Scaffolders;
 
 use Services\Request;
 
@@ -38,7 +38,7 @@ class ResourceScaffold {
         $inverted = app('colorful') ? 'inverted segment' : '';
         $bg_white = empty($inverted)  ? 'background: white' : '';
         echo"
-            <div class='ui secondary segment {$primary_color} {$inverted} vertical menu fixed' id='side-menu' style='overflow: auto; {$bg_white}; padding: 5px 5px'>".
+            <div class='ui secondary segment {$primary_color} {$inverted} vertical menu fixed' id='side-menu' style='overflow: auto; {$bg_white}; padding: 5px 5px; box-shadow: 2px 0px 5px rgba(0,0,0,0.1)'>".
 
                 self::$elements
 
