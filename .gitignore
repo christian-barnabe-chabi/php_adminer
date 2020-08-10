@@ -1,0 +1,5 @@
+.env.json
+app/resources
+views/*
+views/!generics
+views/!samples
