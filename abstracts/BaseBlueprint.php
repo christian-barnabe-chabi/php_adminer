@@ -458,9 +458,11 @@ abstract class BaseBlueprint extends Resource {
 
     public function edit($data) {
         if(!$this->editable) {
-            Presenter::present('generics.unauthorised');
+            return "";
+            // Presenter::present('generics.unauthorised');
+        } else {
+            return EditGuesser::render($this, (Object) $data);
         }
-        return EditGuesser::render($this, (Object) $data);
     }
 
     /**
