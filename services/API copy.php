@@ -66,10 +66,6 @@ class API {
 
             if($http_code == 0) {
                 $response = "<code>{$this->url}</code><br>".Translation::translate('is_api_working');
-                Presenter::present('generics.error', [
-                    'error_description' => $response,
-                ]);
-                exit();
             }
 
             $responseObject = is_string($response) ? json_decode($response) : $response;
@@ -79,38 +75,78 @@ class API {
 
 
                 switch($http_code) {
-                    case 401:
-                        Session::set('oauth', null);
-                        $messageInResponse = Translation::translate('not_found_api') . $messageInResponse . (app('debug') ? '<div><code>'.$response.'</code></div>' : "");
-                    break;
                     case 404:
-                        $messageInResponse = Translation::translate('not_found_api') . $messageInResponse . (app('debug') ? '<div><code>'.$response.'</code></div>' : "");
+                        $messageInResponse = Translation::translate('not_found_api') . $messageInResponse . '<div><code>' . (app('debug') ? $response : "") . '</code></div>';
                     break;
 
                     case 422:
-                        $messageInResponse = Translation::translate('422') . $messageInResponse . (app('debug') ? '<div><code>'.$response.'</code></div>' : "");
+                        $messageInResponse = Translation::translate('422') . $messageInResponse . '<div><code>' . (app('debug') ? $response : "") . '</code></div>';
                     break;
 
                     default:
-                        $messageInResponse = Translation::translate('error_occurs') . $messageInResponse . (app('debug') ? '<div><code>'.$response.'</code></div>' : "");
+                        $messageInResponse = Translation::translate('error_occurs') . $messageInResponse . '<div><code>' . (app('debug') ? $response : "") . '</code></div>';
 
                 }
 
+                // return Presenter::present("generics.error", [
+                //     "error_info" => "API",
+                //     "error_code" => $http_code,
+                //     "error_description"=>$response ?? Translation::translate('failure'),
+                //     "url" => $this->method .' '. $url,
+                // ]);
             }
 
+            // if(($res = Translation::translate($http_code)) != $http_code) {
+            //     $response = $res;
+            // }
+
+            // begin update
             $this->response = (object)[];
+
+            
+            // if(is_string($response)){
+            //     $response = json_decode($response);
+                
+            // }
+            
+            // $this->response = $response;
+            
+            // if(!isset($response->message) || $response->message == NULL) {
+            //     $this->response->message = $res;
+            // } else {
+            //     $this->response->message = $response->message;
+            // }
             
             $this->response->message = $messageInResponse;
             $this->response->success = false;
 
+            // var_dump($this->response());
+            // exit();
+
             curl_close($this->ch);
         
             return $this;
+            // end update
+
+            //begin comment -- old code
             
+            /*
+                Presenter::present("generics.error", [
+                    "error_info" => "API",
+                    "error_code" => $http_code,
+                    "error_description"=>$response ?? "Error",
+                    "url" => $this->method .' '. $url,
+                ]);
+
+                exit();
+            */
+
+            // end comment
         }
 
-        $this->response = $response;
-
+        // else {
+            $this->response = $response;
+        // }
 
         curl_close($this->ch);
         

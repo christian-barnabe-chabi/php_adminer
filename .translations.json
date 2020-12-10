@@ -27,6 +27,10 @@
         "fr": "Mise à jour",
         "en": "Update"
     },
+    "loading": {
+        "fr": "Chargement ... ",
+        "en": "Loading ..."
+    },
     "back": {
         "fr": "Retour",
         "en": "Back"
@@ -90,6 +94,10 @@
     "not_found_api": {
         "fr": "Page introuvable",
         "en": "Page not found"
+    },
+    "error_occurs": {
+        "fr": "Une erreur est survenue. Veuillez réesayer.",
+        "en": "An error occurs. Please try again"
     },
     "error": {
         "fr": "Erreur",
@@ -167,6 +175,10 @@
         "fr": "Fin",
         "en": "End"
     },
+    "due_at": {
+        "fr": "Date de la réunion",
+        "en": "Meeting date"
+    },
     "day_of_week": {
         "fr": "Jour",
         "en": "Day of week"
@@ -232,8 +244,8 @@
         "en": "Phone"
     },
     "phone_alt": {
-        "fr": "Téléphone (alt)",
-        "en": "Phone (alt)"
+        "fr": "Téléphone 2",
+        "en": "Phone 2"
     },
     "administrative_function": {
         "fr": "Fonction administrative",
@@ -248,8 +260,8 @@
         "en": "Email address"
     },
     "email_alt": {
-        "fr": "Adresse email (alt)",
-        "en": "Email address (alt)"
+        "fr": "Adresse email 2",
+        "en": "Email address 2"
     },
     "raised_by": {
         "fr": "A la demande de",
@@ -324,8 +336,12 @@
         "en": "Website"
     },
     "internet_link": {
-        "fr": "Lien Internet",
-        "en": "Internet Link"
+        "fr": "Lire plus",
+        "en": "Read more"
+    },
+    "email_link": {
+        "fr": "Envoyer un mail",
+        "en": "Send an email"
     },
     "password_forgot": {
         "fr": "Mot de passe oublié",
@@ -368,11 +384,11 @@
         "en": "About"
     },
     "mark as read": {
-        "fr": "Marquer comme lue",
+        "fr": "Marquer comme lu",
         "en": "Mark as read"
     },
     "mark all as read": {
-        "fr": "Marquer tout comme lue",
+        "fr": "Marquer tout comme lu",
         "en": "Mark all as read"
     },
     "visit_reason": {
@@ -446,5 +462,61 @@
     "profile": {
         "fr": "Profil",
         "en": "Profile"
+    },
+    "download": {
+        "fr": "Télécharger",
+        "en": "Download"
+    },
+    "document_path": {
+        "fr": "Document",
+        "en": "Document"
+    },
+    "Send mail": {
+        "fr": "Laisser un mail",
+        "en": "Send mail"
+    },
+    "tender": {
+        "fr": "Appel d'offre",
+        "en": "Call for tender"
+    },
+    "presentation": {
+        "fr": "Présentation",
+        "en": "Presentation"
+    },
+    "correct_data": {
+        "fr": "Réessayer",
+        "en": "Try again"
+    },
+    "limit_date": {
+        "fr": "Date fermeture",
+        "en": "Limit date"
+    },
+    "opening_date": {
+        "fr": "Date ouverture",
+        "en": "Opening date"
+    },
+    "change_password": {
+        "fr": "Changer mot de passe",
+        "en": "Change password"
+    },
+    "edit_profile_details": {
+        "fr": "Changer mes informations",
+        "en": "Change profil information"
+    },
+    "tender_responses": {
+        "fr": "Offres soumises",
+        "en": "Call for tender responses"
+    },
+    "user_satisfaction": {
+        "fr": "Satisfaction client",
+        "en": "User satisfaction"
+    },
+    "bank": {
+        "fr": "Banque",
+        "en": "Bank"
+    },
+    "page is loading": {
+        "fr": "Chargement ...",
+        "en": "Loading ..."
     }
 }

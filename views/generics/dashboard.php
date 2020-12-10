@@ -1,4 +1,4 @@
-<script src="/assets/js/stats.js"></script>
+<script src="/public/js/stats.js"></script>
 
 <?php
 

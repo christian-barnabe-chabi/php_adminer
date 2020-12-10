@@ -1,6 +1,6 @@
 <?php
 
-namespace Services\Scaffolders;
+namespace Services\Scaffolders\Embeded;
 
 use Abstracts\BaseBlueprint;
 use Services\API;
@@ -8,42 +8,33 @@ use Services\Auth;
 use Lib\form\Checkbox;
 use Lib\form\Dropdown;
 use Services\Request;
-use Services\Route;
-use Services\Router;
+use Services\Scaffolders\ColumnAttribute;
 use Services\Translation;
 
 class EditGuesser {
 
-    public static function render(BaseBlueprint $blueprint, $data) {
+    public static function render(BaseBlueprint $blueprint, $data, string $parent) {
 
-        // $resource = Request::$request->php_admin_resource;
-        $php_admin_form_action = Request::$request->php_admin_form_action ?? Router::route();
-        
+        $resource = Request::$request->php_admin_resource;
+
         $uid_field = $blueprint->uid_field();
         if(isset($data->$uid_field))
             $uid = $data->$uid_field;
         else
             return;
 
-        
         $response = $data;
-        
-        
+
         if(is_array($response)) {
             exit("Multiple data send. Can't handle it");
         }
-        
+
         $keys = array_keys($blueprint->get_columns());
-        
-        $embeded_blueprints = "";
-        
-        $blueprint->editPreRenderConfig($response);
-        
-        $elements = "<form autocomplete='new-password' action='{$php_admin_form_action}' method='POST' enctype='multipart/form-data'>";
-        
+
+        $elements = "<div class='embeded_row ui segment'>";
+
             $elements .= "<input name='php_admin_action' type='hidden' value='update'>";
             $elements .= "<input name='php_admin_uid' type='hidden' value='$uid'>";
-            
             $elements .= "<div class='ui three column stackable grid'>";
 
                 foreach ($keys as $value) {
@@ -94,24 +85,6 @@ class EditGuesser {
 
                     $column->name = str_replace('_',' ' ,ucfirst($column->name));
 
-
-                     // Type Blueprint or embeded
-                     if($column->type == 'blueprint' && is_array($column->columns)) {
-                        $embeded_form = "";
-                        $temp_blueprint = new CustomBlueprint();
-                        $temp_blueprint->set_columns($column->columns);
-                        $embeded_form .= $temp_blueprint->embeded_edit($value, $column->variable);
-
-                        // echo $embeded_form;
-                        
-                        $embeded_blueprints .= "<h4 class='embeded_row_add_btn'>{$column->name} <button type='button' class='ui button mini blue floated right'>Add</button></h4>";
-                        $embeded_blueprints .= "<div class='embeded_row_sample' style='display:none'>".$embeded_form."</div>";
-                        $embeded_blueprints .= "<div class='embeded_main_rows_container'></div>";
-
-                        continue;
-                    }
-
-
                     $relation = $column->relation;
 
 
@@ -143,7 +116,7 @@ class EditGuesser {
                                         // image
                                         $required_indicator = '';
                                         if($column->required) {
-                                            $required_indicator = "<small class='uk-text-danger'> (".Translation::translate('field required').") ". $column->detail ."</small>";
+                                            $required_indicator = "<small class='uk-text-danger'>  (".Translation::translate('field required').") (". $column->detail .")</small>";
                                         }
 
                                         $label  = "<label for='".$value."'>".$column->name.$required_indicator."</label>";
@@ -159,9 +132,8 @@ class EditGuesser {
                                         // $elements .= "<label for='".$value."'>".$column->name."</label>";
                                         $elements .= $label;
                                         $elements .= "<div class='ui input small'>";
-                                        $column_id = $column->id ?? "id='{$column->id}'";
-                                        $elements .= "<input $column->accept class='{$column->class}' maxlength='{$column->length}' {$column->required} autocomplete='new-password' value=". '"' . $old_value . '"' ." 
-                                        type='".$column->type."' 
+                                        $elements .= "<input class='{$column->class}' id='{$column->id}' maxlength='{$column->length}' {$column->required} autocomplete='new-password' value=". '"' . $old_value . '"' ." 
+                                        type='".$column->type."' id='".$value."' 
                                         name='".$column->variable."' 
                                         placeholder=". '"' . $column->name . '"' .">";
                                         $elements .= "</div>";
@@ -254,7 +226,7 @@ class EditGuesser {
 
                                 $required_indicator = '';
                                 if($column->required) {
-                                    $required_indicator = "<small class='uk-text-danger'>  (".Translation::translate('field required').") ". $column->detail ."</small>";
+                                    $required_indicator = "<small class='uk-text-danger'>  (".Translation::translate('field required').") (". $column->detail .")</small>";
                                 }
 
                                 $elements .= "<label for='".$value."'>".$column->name.$required_indicator."</label>";
@@ -285,7 +257,7 @@ class EditGuesser {
 
                                 $required_indicator = '';
                                 if($column->required) {
-                                    $required_indicator = "<small class='uk-text-danger'>  (".Translation::translate('field required').") ". $column->detail ."</small>";
+                                    $required_indicator = "<small class='uk-text-danger'>  (".Translation::translate('field required').") (". $column->detail .")</small>";
                                 }
 
                                 $elements .= "<label for='".$value."'>".$column->name.$required_indicator."</label>";
@@ -315,7 +287,7 @@ class EditGuesser {
 
                                     $required_indicator = '';
                                     if($column->required) {
-                                        $required_indicator = "<small class='uk-text-danger'>  (".Translation::translate('field required').") ". $column->detail ."</small>";
+                                        $required_indicator = "<small class='uk-text-danger'>  (".Translation::translate('field required').") (". $column->detail .")</small>";
                                     }
 
                                     $elements .= "<label for='".$value."'>".$column->name.$required_indicator."</label>";
@@ -329,7 +301,6 @@ class EditGuesser {
 
                     // exit("HERE");
                     // is text
-                    // $old_value = Session::get('create_old_data')[$column->variable] ?? '';
                     if($column->type == 'longtext') {
 
                         $elements .= "<div class='column' id='{$column->id}_container'>";
@@ -338,14 +309,13 @@ class EditGuesser {
     
                                     $required_indicator = '';
                                     if($column->required) {
-                                        $required_indicator = "<small class='uk-text-danger'>  (".Translation::translate('field required').") ". $column->detail ."</small>";
+                                        $required_indicator = "<small class='uk-text-danger'>  (".Translation::translate('field required').") (". $column->detail .")</small>";
                                     }
 
                                     $elements .= "<label for='".$value."'>".$column->name.$required_indicator."</label>";
-                                    $elements .= "<div class='ui input small'>";
-                                        $column_id = $column->id ?? "id='{$column->id}'";
-                                        $elements .= "<textarea $column->required class='{$column->class}' maxlength='{$column->length}' style='resize: vertical; height: 100px' 
-                                        type='".$column->type."' 
+                                    $elements .= "<div class='ui input mini'>";
+                                        $elements .= "<textarea class='{$column->class}' id='{$column->id}' maxlength='{$column->length}' style='resize: vertical; height: 100px' 
+                                        type='".$column->type."' id='".$value."' 
                                         name='".$column->variable."' 
                                         placeholder=". '"' .$column->name . '"' . ">{$old_value}</textarea>";
                                     $elements .= "</div>";
@@ -360,7 +330,7 @@ class EditGuesser {
                     // image
                     $required_indicator = '';
                     if($column->required) {
-                        $required_indicator = "<small class='uk-text-danger'>  (".Translation::translate('field required').") ". $column->detail ."</small>";
+                        $required_indicator = "<small class='uk-text-danger'>  (".Translation::translate('field required').") (". $column->detail .")</small>";
                     }
 
                     $label  = "<label for='".$value."'>".$column->name.$required_indicator."</label>";
@@ -383,9 +353,8 @@ class EditGuesser {
                     
                                 $elements .= $label; //"<label for='".$value."' uk-lightbox><a href='$old_value'>".$column->name."</a></label>";
                                 $elements .= "<div class='ui input small'>";
-                                $column_id = $column->id ?? "id='{$column->id}'";
-                                $elements .= "<input $column->accept class='{$column->class}' maxlength='{$column->length}' {$column->required} autocomplete='new-password' value=". '"' . $old_value . '"' ." 
-                                type='".$column->type."' 
+                                $elements .= "<input class='{$column->class}' id='{$column->id}' maxlength='{$column->length}' {$column->required} autocomplete='new-password' value=". '"' . $old_value . '"' ." 
+                                type='".$column->type."' id='".$value."' 
                                 name='".$column->variable."' 
                                 placeholder=". '"' . $column->name . '"' .">";
                                 $elements .= "</div>";
@@ -396,14 +365,8 @@ class EditGuesser {
 
             $elements .= "</div>";
 
-            $elements .= $embeded_blueprints;
 
-            $elements .= "<div class='uk-margin uk-text-right'>";
-                $elements .= "<button data-value=\"$uid\" data-url=\"".app('baseUrl').$blueprint->endpoints()->update."\" data-method='{$blueprint->endpoints_methods()->update}' class='ui button blue small resource_update_submit_button' type='submit'><i class='ui icon check'></i>". Translation::translate("save") ."</button>";
-            $elements .= "</div>";
-
-
-        $elements .= "</form>";
+        $elements .= "</div>";
 
         return $elements;
 

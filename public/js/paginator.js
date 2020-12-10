@@ -1,12 +1,12 @@
-class Paginator {
+Paginator = class {
     constructor(table, page) {
         this.table = table
         this.page = page
         this.table_body = this.table.children('tbody')
         this.table_rows = this.table_body.children('tr')
         this.length = this.table_rows.length
-        
-        
+
+
         this.prevBtn = this.table.parent('div').nextAll('div').find('#paginator_prev')
         this.nextBtn = this.table.parent('div').nextAll('div').find('#paginator_next')
         this.currentPageField = this.table.parent('div').nextAll('div').find('#current_page_field')
@@ -14,7 +14,7 @@ class Paginator {
         this.perPageField = this.table.parent('div').nextAll('div').find('#per_page_field')
 
         this.currentPageField.attr('min', 1)
-        
+
         this.setLastPage()
         this.fill()
 
@@ -22,41 +22,41 @@ class Paginator {
 
         this.currentPage = this.currentPageField.val()
 
-        this.prevBtn.on('click', (event)=>{
-            
-            if(this.currentPage <= 1) {
-                
+        this.prevBtn.on('click', (event) => {
+
+            if (this.currentPage <= 1) {
+
             } else {
                 this.currentPage--
-                this.page = this.currentPage
+                    this.page = this.currentPage
                 this.fill()
             }
 
         })
-        
-        this.nextBtn.on('click', (event)=>{
 
-            if(this.currentPage == this.last_page) {
+        this.nextBtn.on('click', (event) => {
+
+            if (this.currentPage == this.last_page) {
 
             } else {
 
                 this.currentPage++
-                this.page = this.currentPage
+                    this.page = this.currentPage
                 this.fill()
             }
 
         })
 
-        this.currentPageField.on('keypress', (event)=> {
+        this.currentPageField.on('keypress', (event) => {
             event.preventDefault()
-            if(event.which == 13) {
+            if (event.which == 13) {
                 this.currentPage = this.currentPageField.val()
                 this.page = this.currentPage
                 this.fill()
-            } 
+            }
         })
 
-        this.perPageField.on('change', (event)=> {
+        this.perPageField.on('change', (event) => {
             this.setLastPage()
             this.page = 1
             this.currentPage = 1;
@@ -66,15 +66,15 @@ class Paginator {
 
     fill() {
 
-        
-        if(this.page >0 )
-        this.page--;
-        
+
+        if (this.page > 0)
+            this.page--;
+
         this.begin = this.page * this.per_page
         this.end = this.begin + this.per_page
-        
-        this.currentPageField.val(this.page+1)
-        
+
+        this.currentPageField.val(this.page + 1)
+
         this.table_rows.hide(0);
         this.chunk = this.table_rows.slice(this.begin, this.end)
         this.chunk.show(250)

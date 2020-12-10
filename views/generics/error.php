@@ -46,7 +46,11 @@ use Services\Translation;
 
 <div class="ui modal compact mini error">
     <div class="header">
-         <?= Translation::translate('error') .' '. $data['error_code'] .' - '. $data['error_info'] ?>
+        <?php
+            if(app('debug'))
+                echo Translation::translate('error') .' '. $data['error_code'] .' - ';
+        ?>
+            <?= $data['error_info'] ?>
     </div>
     <div class="content">
         <?= app('debug') && isset($data['url']) ? '<code>'.$data['url'].'</code><br>' : '' ?>

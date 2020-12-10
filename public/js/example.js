@@ -1,10 +1,11 @@
-$(document).ready(()=>{
+$(document).ready(() => {
 
     class MeetingStates {
         constructor(element) {
             this.element = $(element);
             this.meeting_method_container = $($(this.element.parents('#_container')).next());
-            this.meeting_link_container = $(this.meeting_method_container.next()); 
+
+            this.meeting_link_container = $(this.meeting_method_container.next());
 
             this.meeting_method_dropdown = $(this.meeting_method_container.children('.form').children('.field').children('.ui.input').children('.meeting_method'))
             this.meeting_method_link = $(this.meeting_link_container.children('.form').children('.field').children('.ui.input').children('.meeting_link'))
@@ -17,7 +18,7 @@ $(document).ready(()=>{
         }
 
         init() {
-            if(this.meeting_method_dropdown.dropdown('get value')) { // meeting_id
+            if (this.meeting_method_dropdown.dropdown('get value')) { // meeting_id
                 this.element.dropdown('set selected', 'online')
             } else {
                 this.element.dropdown('set selected', 'physical')
@@ -27,6 +28,7 @@ $(document).ready(()=>{
         }
 
         onChange() {
+
             let element = this.element;
             let meeting_method_dropdown = this.meeting_method_dropdown;
             let meeting_method_container = this.meeting_method_container;
@@ -36,8 +38,8 @@ $(document).ready(()=>{
             let meeting_method_id_old = this.meeting_method_id_old;
 
             this.element.dropdown({
-                onChange : function() {
-                    if(element.dropdown('get value') == 'physical') {
+                onChange: function() {
+                    if (element.dropdown('get value') == 'physical') {
                         meeting_method_container.hide();
                         meeting_link_container.hide();
 

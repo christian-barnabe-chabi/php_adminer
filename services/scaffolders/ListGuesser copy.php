@@ -84,8 +84,7 @@ class ListGuesser {
                 $create_modal_form .= "</div>";
     
                 $create_modal_form .= "<div class='content scrolling'>";
-                    $create_modal_form .= $blueprint->create();
-                    // $create_modal_form .= Resource::call($class, [], 'create');
+                    $create_modal_form .= Resource::call($class, [], 'create');
                 $create_modal_form .= "</div>";
             $create_modal_form .= "</div>";
         }
@@ -95,16 +94,13 @@ class ListGuesser {
         $delete_element = "";
         $delete_modal_confirm = "";
         if(self::$blueprint->deleteable()) {
-
-            // onclick=\"
-            //         $('#confirm_delete').modal({
-            //             transition: 'fly',
-            //             closable: false,
-            //         }).modal('show')\"
-
             $delete_element = "
-                <span
-                class='ui button mini orange resource_multiple_delete_button' >
+                <span onclick=\"
+                    $('#confirm_delete').modal({
+                        transition: 'fly',
+                        closable: false,
+                    }).modal('show')\"
+                class='ui button mini orange' >
                 <i class=' ui icon trash'></i>
                     ". Translation::translate("delete") ."
                 </span>
@@ -123,8 +119,7 @@ class ListGuesser {
                     $delete_modal_confirm .= "</div>";
         
                     $delete_modal_confirm .= "<div class='actions'>";
-                        // onclick=\"$('#multiple_delete_button').trigger('click')\"
-                        $delete_modal_confirm .= "<button data-url=\"".app('baseUrl').$blueprint->endpoints()->delete."\" data-method='{$blueprint->endpoints_methods()->delete}' class='ui button small orange' id='modal_delete_multitple_button'>". Translation::translate('delete') ."</button>";
+                        $delete_modal_confirm .= "<button onclick=\"$('#multiple_delete_button').trigger('click')\" class='ui button small orange'>". Translation::translate('delete') ."</button>";
                         $delete_modal_confirm .= "<button class='ui button small olive deny'>". Translation::translate('cancel') ."</button>";
                     $delete_modal_confirm .= "</div>";
                 $delete_modal_confirm .= "</div>";
@@ -138,7 +133,7 @@ class ListGuesser {
         $export_element = "";
         if(self::$blueprint->exportable()) {
             $export_element = "
-                <button name='php_admin_export' value='' class='ui button mini yellow' id='resource_multiple_export_button'>
+                <button name='php_admin_export' value='' class='ui button mini yellow' >
                     <i class=' ui icon save'></i>
                     ". Translation::translate("export") ."
                 </button>
@@ -238,8 +233,7 @@ class ListGuesser {
                                     $update_modal_forms .= "</div>";
     
                                     $update_modal_forms .= "<div class='content scrolling'>";
-                                        $update_modal_forms .= $blueprint->edit((array)$obj);
-                                        // $update_modal_forms .= Resource::call($class, (Array)$obj, 'edit');
+                                        $update_modal_forms .= Resource::call($class, (Array)$obj, 'edit');
                                     $update_modal_forms .= "</div>";
                                 $update_modal_forms .= "</div>";
                             }
@@ -254,7 +248,7 @@ class ListGuesser {
                                     $delete_modal_confirm .= "<form method='POST' class='actions' action='/{$route}'>";
                                         $delete_modal_confirm .= "<input name='php_admin_action' type='hidden' value='delete'>";
                                         $delete_modal_confirm .= "<input name='php_admin_uid' type='hidden' value='$uid'>";
-                                        $delete_modal_confirm .= "<button type='button' data-url=\"".app('baseUrl').$blueprint->endpoints()->delete."\" data-method='{$blueprint->endpoints_methods()->delete}' data-value=\"$uid\" class='ui button small orange modal_delete_button'>". Translation::translate('delete') ."</button>";
+                                        $delete_modal_confirm .= "<button onclick=\"$('#multiple_delete_button').trigger('click')\" class='ui button small orange'>". Translation::translate('delete') ."</button>";
                                         $delete_modal_confirm .= "<button type='button' class='ui button small olive deny'>". Translation::translate('cancel') ."</button>";
                                     $delete_modal_confirm .= "</form>";
                                 $delete_modal_confirm .= "</div>";
@@ -276,8 +270,7 @@ class ListGuesser {
                             // </form>";
                             foreach(self::$table_columns as $column_name) {
                                 // $show_link = "onclick='$(\"#show_$row_data_id\").submit()'";
-                                // $show_link = "onclick='document.location = \"/{$route}/show/{$uid}\";'";
-                                $show_link = "onclick=\"loadPageAt('/{$route}/show/{$uid}')\"";
+                                $show_link = "onclick='document.location = \"/{$route}/show/{$uid}\";'";
 
                                 $cell_values = "";
                                 $cell_value = "";
@@ -432,7 +425,7 @@ class ListGuesser {
                             }
 
                             // actions links
-                            $elements .= "<td class='collapsing right aligned'>";
+                            $elements .= "<td class='collapsing center aligned'>";
                                 $elements .= "<a href='/{$route}/show/{$uid}' class='uk-link-text uk-link-reset'><i class='ui icon eye gree'></i></a>";
 
                                 if($blueprint->editable($obj))
@@ -444,11 +437,12 @@ class ListGuesser {
                                     href='/{$route}/edit/{$uid}' class='uk-link-text uk-link-reset'><i class='ui icon edit blue'></i></span>";
 
                                 if($blueprint->deleteable($obj))
-                                    $elements .= "<span 
-                                    data-target='confirm_delete_$row_data_id' 
-                                    class='uk-link-text uk-link-reset resource_delete_button'>
-                                        <i class='ui icon trash orange'></i>
-                                    </span>";
+                                    $elements .= "<span onclick=\"
+                                        $('#confirm_delete_$row_data_id').modal({
+                                            transition: 'fly',
+                                            closable: false,
+                                        }).modal('show')\"
+                                    class='uk-link-text uk-link-reset'><i class='ui icon trash orange'></i></span>";
                             $elements .= "</td>";
 
                             $elements .= "</tr>";
@@ -623,7 +617,7 @@ class ListGuesser {
 
             $elements .=
             "<td class='' uk-lightbox>
-                <a href='$cell_value' class='external-link'>
+                <a href='$cell_value'>
                 <img {$tooltip} src='$cell_value' class='ui $form image tiny' {$style}>
                 </a>
             </td>";
@@ -636,7 +630,7 @@ class ListGuesser {
         // link
 
         if(preg_match($re1, $cell_value, $matches)) {
-            $cell_value = "<a class='external-link' href='{$matches[0]}' target='_blank' data-tooltip='$matches[0]'>". Translation::translate('internet_link') ." <i class='external alternate icon'></i></a>";
+            $cell_value = "<a href='{$matches[0]}' target='_blank' data-tooltip='$matches[0]'>". Translation::translate('internet_link') ." <i class='external alternate icon'></i></a>";
             $cell_link = '';
 
             $elements .=
@@ -648,7 +642,7 @@ class ListGuesser {
 
             return $elements;
         } else if(preg_match($re2, $cell_value, $matches)) { // email
-            $cell_value = "<a class='external-link' href='mailto:{$matches[0]}' data-tooltip='$matches[0]' target='_blank'><i class='ui icon mail'></i>". Translation::translate('email_link') ."</a>";
+            $cell_value = "<a href='mailto:{$matches[0]}' data-tooltip='$matches[0]' target='_blank'><i class='ui icon mail'></i>". Translation::translate('email_link') ."</a>";
             $cell_link = '';
 
             $elements .=

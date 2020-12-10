@@ -217,7 +217,7 @@ class CsvExportGuesser {
             }
         }
 
-        return ['file_content'=>$elements, 'file_link'=>"<a class=' uk-link uk-link-heading' href='/$path'><i class='ui icon file excel large'></i> ".$filename."</a>"];
+        return ['file_content'=>$elements, 'file_link'=>"<a target='_blank' class=' uk-link uk-link-heading external-link' href='/$path'><i class='ui icon file excel large'></i> ".$filename."</a>"];
 
     }
 
@@ -231,25 +231,25 @@ class CsvExportGuesser {
     }
 }
 
-{
-    if(!(\is_dir("temp"))) {
-        mkdir("temp");
-    }
+// {
+//     if(!(\is_dir("temp"))) {
+//         mkdir("temp");
+//     }
 
-    $exporting = explode( "\\" ,get_class($blueprint));
-    $exporting = plurial_noun(strtolower($exporting[count($exporting)-1]));
-    $filename = 'export_'.$exporting.'_'.date("Y_m_d:h_i_s").'.csv';
-    $path = 'temp/'.$filename;
-    if($file = fopen($path, 'w')) {
-        try {
-            fwrite($file, $elements);
-            fclose($file);
-        } catch(Exception $e) {
-            echo $e->getMessage();
-        }
-    }
+//     $exporting = explode( "\\" ,get_class($blueprint));
+//     $exporting = plurial_noun(strtolower($exporting[count($exporting)-1]));
+//     $filename = 'export_'.$exporting.'_'.date("Y_m_d:h_i_s").'.csv';
+//     $path = 'temp/'.$filename;
+//     if($file = fopen($path, 'w')) {
+//         try {
+//             fwrite($file, $elements);
+//             fclose($file);
+//         } catch(Exception $e) {
+//             echo $e->getMessage();
+//         }
+//     }
 
-    return ['file_content'=>$elements, 'file_link'=>"<a class=' uk-link uk-link-heading' href='/$path'><i class='ui icon file excel large'></i> ".$filename."</a>"];
-}
+//     return (['file_content'=>$elements, 'file_link'=>"<a target='_blank' class='uk-link uk-link-heading external-link' href='/$path'><i class='ui icon file excel large'></i> ".$filename."</a>"]);
+// }
 
 ?>

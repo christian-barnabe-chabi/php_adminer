@@ -76,5 +76,7 @@ function deldir(string $dir) {
     }
 }
 
+header("Access-Control-Allow-Origin: *");
+
 
 ?>

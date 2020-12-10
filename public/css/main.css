@@ -1,28 +1,32 @@
-/* body {
-    min-width: 800px !important;
+html {
+    min-width: 1125px !important;
     overflow-x: auto;
-} */
+}
 
 @font-face {
     font-family: 'montserrat-light';
-    src : url('/assets/fonts/Montserrat-Light.ttf');
+    src: url('/public/fonts/Montserrat-Light.ttf');
 }
 
 @font-face {
     font-family: 'montserrat-medium';
-    src : url('/assets/fonts/Montserrat-Medium.ttf');
+    src: url('/public/fonts/Montserrat-Medium.ttf');
 }
 
 @font-face {
     font-family: 'montserrat';
-    src : url('/assets/fonts/Montserrat-Regular.ttf');
+    src: url('/public/fonts/Montserrat-Regular.ttf');
 }
 
-.ui.menu.fixed .item:first-child, .ui.menu.fixed .item:last-child, .ui.menu:not(.pagination) .item, .ui.secondary.vertical.menu>.item {
+.ui.menu.fixed .item:first-child,
+.ui.menu.fixed .item:last-child,
+.ui.menu:not(.pagination) .item,
+.ui.secondary.vertical.menu>.item {
     border-radius: 50px !important;
 }
 
-html, body {
+html,
+body {
     height: 100%;
     min-width: 1126px !important;
     /* background-color: #f6faff; */
@@ -35,12 +39,12 @@ html, body {
     padding-right: 4px !important;
 }
 
-.selected_row  {
+.selected_row {
     background-color: rgb(189, 229, 255) !important;
     transition: all 0.2s ease-in-out;
 }
 
-.selected_row:hover  {
+.selected_row:hover {
     background-color: rgb(112, 210, 255) !important;
 }
 
@@ -56,7 +60,7 @@ html, body {
     position: relative;
 }
 
-#container-sidebar{
+#container-sidebar {
     overflow-y: scroll !important;
 }
 
@@ -64,12 +68,13 @@ html, body {
     z-index: 99;
 }
 
-#side-menu, #main-container {
+#side-menu,
+#main-container {
     display: none;
 }
 
 #side-menu a.active.item {
-    background-image: url(/assets/img/bg.jpg);
+    /* background-image: url(/public/img/bg.jpg); */
     background-size: cover;
     background-repeat: no-repeat;
     background-blend-mode: multiply;
@@ -83,15 +88,20 @@ th {
     cursor: pointer !important;
 }
 
-/* sort arrow disable */
-th.sorted.ascending:after {
-	content: "  \2191";
-}
 
 /* sort arrow disable */
-th.sorted.descending:after {
-	content: " \2193";
+
+th.sorted.ascending:after {
+    content: "  \2191";
 }
+
+
+/* sort arrow disable */
+
+th.sorted.descending:after {
+    content: " \2193";
+}
+
 
 /* input,
 select,
@@ -108,11 +118,13 @@ select,
     border-radius: 0px !important;
 } */
 
+
 /* tbody {
     transition: all 0.5s ease;
 } */
 
-pre, code {
+pre,
+code {
     line-break: anywhere !important;
     word-break: break-all !important;
     white-space: pre-line !important;
@@ -120,14 +132,19 @@ pre, code {
     white-space: -moz-pre-wrap !important;
     white-space: -pre-wrap !important;
     white-space: -o-pre-wrap !important;
-    word-wrap: break-word !important;;
+    word-wrap: break-word !important;
+    ;
 }
 
 
-
 /* #show_tables td { */
-    /* white-space: break-spaces !important; */
+
+
+/* white-space: break-spaces !important; */
+
+
 /* } */
+
 
 /* table td {
     line-break: anywhere !important;

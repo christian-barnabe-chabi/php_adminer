@@ -30,6 +30,7 @@ use Services\Translation;
                 <?php endif; ?>
             </a>
         </div>
+        <div class="item uk-margin-remove" id="page_progress" style="display:none;"><div class="ui active <?= $inverted ?> tiny inline loader"></div><span class=' uk-margin-small-right'></span><?= Translation::translate('page is loading') ?></div>
     </nav>
 
 

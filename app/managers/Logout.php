@@ -10,6 +10,8 @@ class Logout extends AbstractsResource {
     public function __construct()
     {
         unset($_SESSION['oauth']);
+        unset($_SESSION['ENV']);
+        unset($_SESSION['translation']);
         Router::redirect("login");
     }
 

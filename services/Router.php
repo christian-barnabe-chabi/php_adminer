@@ -9,7 +9,6 @@ class Router {
 
     public static function load() {
         if(isset(Request::$request->php_admin_resource) && $resource = Request::$request->php_admin_resource) {
-            // Resource::load(Request::$request->php_admin_resource, (Array)Request::$request);
 
             $resource = str_replace('_', ' ', $resource);
             $resource = ucwords($resource);

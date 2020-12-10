@@ -15,6 +15,7 @@ use Services\Presenter;
 use Services\Request;
 use Services\Resource as ServicesResource;
 use Services\Router;
+use Services\Session;
 use Services\Translation;
 
 abstract class BaseBlueprint extends Resource {
@@ -29,6 +30,7 @@ abstract class BaseBlueprint extends Resource {
     protected $editable = true;
     protected $deleteable = true;
     protected $exportable = true;
+    protected $alwaysExportAll = false;
     protected $uid = 'id';
     protected $model = null;
     protected $hidden = [];
@@ -37,9 +39,24 @@ abstract class BaseBlueprint extends Resource {
     protected $widgets_positions = [];
     protected $data;
     protected $action; // request action -
+    protected $online_paginate = false;
+    protected $local_paginate = true;
+    protected $embeded = false;
+    protected $endpoints_methods = [
+        "create" => "POST",
+        "read" => "GET",
+        "update" => "PUT",
+        "delete" => "DELETE",
+    ];
 
     public function __construct()
     {
+
+        Translation::define(422, [
+            "fr" => "Assurez-vous de remplir correctement tous les champs",
+            "en" => "Make sure you fill in all the fields correctly",
+        ]);
+
         $data = clone Request::$request;
         $this->action = clone (Object) $data;
         
@@ -67,13 +84,51 @@ abstract class BaseBlueprint extends Resource {
             $this->api->header("Authorization", app('authType').' '.Auth::token());
         }
 
-        if(isset(Request::$request->php_admin_update) || isset(Request::$request->php_admin_save) || isset(Request::$request->php_admin_delete) || isset(Request::$request->php_admin_export)) {
+        if($this->embeded || isset(Request::$request->php_admin_update) || isset(Request::$request->php_admin_save) || isset(Request::$request->php_admin_delete) || (isset(Request::$request->php_admin_export) && !$this->alwaysExportAll) ) {
             // updating or saving or deleting or exporting
         } else {
 
             $this->url = app('baseUrl').$this->endpoints["list"];
+
+            // pagination
+            if($this->online_paginate) {
+
+                $this->data_fetched = $this->api->callWith($this->url, $this->endpoints_methods()->read, (array)$data)->response();
+                // $this->data_fetched = $this->api->get($this->url, (array)$data)->response();
+
+                if(isset($this->online_paginate['count'])) {
+                    $key = $this->online_paginate['count'];
+                    if(isset($this->data_fetched->$key)) {
+                        $this->online_paginate['count'] = $this->data_fetched->$key;
+                    }
+                    else {
+                        $this->online_paginate['count'] = null;
+                    }
+                } else {
+                    $this->online_paginate['count'] = null;
+                }
+
+                if(isset($this->online_paginate['last_page'])) {
+                    $key = $this->online_paginate['last_page'];
+                    if(isset($this->data_fetched->$key)) {
+                        $this->online_paginate['last_page'] = $this->data_fetched->$key;
+                    } else {
+                        $this->online_paginate['last_page'] = null;
+                    }
+                } else {
+                    $this->online_paginate['last_page'] = null;
+                }
+
+                if(isset($this->online_paginate['data_field'])) {
+                    $data_field = $this->online_paginate['data_field'];
+                    $this->data_fetched = $this->data_fetched->$data_field;
+                } else {
+                    exit('error');
+                }
+            } else {
+                $this->data_fetched = $this->api->get($this->url)->response();
+            }
             
-            $this->data_fetched = $this->api->get($this->url)->response();
 
             try {
                 // if(PublicResource::isPublic(Router::route())) {
@@ -82,12 +137,19 @@ abstract class BaseBlueprint extends Resource {
                     // if(!is_array($this->data_fetched)) {
                     //     throw new Exception("Exception: An array is required for listing");
                     // }
-                    $keys = $this->data_fetched[0] ?? null;
+                    // var_dump($this->data_fetched);
+                    if(is_array($this->data_fetched) && isset($this->data_fetched[0])) {
+                        $keys = $this->data_fetched[0] ?? null;
+                    } else {
+                        $keys = null;
+                    }
                 // }
 
 
-                if(isset($keys))
+                // exit();
+                if(isset($keys)) {
                     $keys = $keys != null ? (get_object_vars($keys)) : [];
+                }
 
             } catch (Exception $e) {
                 Presenter::present('generics.error', [
@@ -99,12 +161,16 @@ abstract class BaseBlueprint extends Resource {
             }
 
             if (empty($this->columns)) {
-                foreach ($keys as $key=>$value) {
-                    if (is_object($this->data_fetched[0]->$key) or is_array($this->data_fetched[0]->$key)) {
-                        continue;
+                if($keys) {
+                    foreach ($keys as $key=>$value) {
+                        if (is_object($this->data_fetched[0]->$key) or is_array($this->data_fetched[0]->$key)) {
+                            continue;
+                        }
+    
+                        $this->columns[$key] = [];
                     }
-
-                    $this->columns[$key] = [];
+                } else{
+                    // echo "<script> alert('Can\'t autodetect resource schema'); </script>";
                 }
             }
 
@@ -197,6 +263,7 @@ abstract class BaseBlueprint extends Resource {
         unset($this->data->php_admin_save);
         unset($this->data->php_admin_search);
         unset($this->data->php_admin_export);
+        unset($this->data->php_admin_action);
 
         /**
          * update
@@ -214,7 +281,7 @@ abstract class BaseBlueprint extends Resource {
          * show single object information
          */
         else if( isset($this->action->php_admin_show)) {
-            echo "<h3 class=' uk-heading-divider'>". $this->go_back() . $this->get_name_singular() ."</h3>";
+            echo "<h3 class=' uk-heading-divider'>". $this->go_back() ."<i class='ui folder open outline icon'></i> | ". $this->get_name_singular() ." | ". Translation::translate('profile') ."</h3>";
             
             $this->validate(['uid'=>'']);
             
@@ -282,13 +349,21 @@ abstract class BaseBlueprint extends Resource {
          * list fetched objects
          */
         else {
-            echo "<h3 class=' uk-heading-divider uk-margin-remove-top'>{$this->get_name_plurial()} | ". Translation::translate('list') ."</h3>";
+            echo "<h3 class=' uk-heading-divider uk-margin-remove-top'><i class='ui folder open outline icon'></i> | {$this->get_name_plurial()} | ". Translation::translate('list') ."</h3>";
             echo $this->list();
         }
     }
 
     public function get_columns() {
         return $this->columns;
+    }
+    
+    public function set_columns(array $columns) {
+        return $this->columns = $columns;
+    }
+
+    public function is_embeded() {
+        return $this->embeded;
     }
 
     protected function unset_guarded(string $value) {
@@ -313,7 +388,7 @@ abstract class BaseBlueprint extends Resource {
         return $this->createable;
     }
 
-    public function editable() {
+    public function editable($data = NULL) {
         return $this->editable;
     }
 
@@ -321,8 +396,16 @@ abstract class BaseBlueprint extends Resource {
         return $this->exportable;
     }
 
-    public function deleteable() {
+    public function deleteable($data = NULL) {
         return $this->deleteable;
+    }
+
+    public function editPreRenderConfig($data) {
+        // code
+    }
+    
+    public function createPreRenderConfig() {
+        // code
     }
 
     public function get_guarded() {
@@ -330,6 +413,7 @@ abstract class BaseBlueprint extends Resource {
     }
 
     public function list() {
+        Session::set('create_old_data', null);
         return ListGuesser::render($this, $this->data_fetched);
     }
 
@@ -341,65 +425,132 @@ abstract class BaseBlueprint extends Resource {
         return CreateGuesser::render($this);
     }
 
-    protected function save(Array $data, $method = "POST") {
+    // create
+    protected function save(Array $data, $external_call = false) {
+
+        $method = $this->endpoints_methods()->create;
 
         $this->url = app('baseUrl').$this->endpoints["create"];
 
         $this->api->callWith($this->url, $method, $data);
 
+        
+        
         $message = isset($this->api->response()->message) ? $this->api->response()->message : json_encode($this->api->response());
-
-
+        
         if(isset($this->api->response()->success) && $this->api->response()->success == false) {
-            Presenter::present("generics.error", [
-                "error_info" => "Failed",
+            
+            Session::set('create_old_data', $data);
+            
+            
+            Presenter::present("generics.error_saving", [
+                "error_info" => Translation::translate('failure'),
                 "error_code" => 200,
-                "error_description"=>"<code>".$message."</code>",
+                "error_description"=>"<span>".$message."</span>",
+                "php_admin_resource_class" => get_class($this),
+                "php_admin_resource_class_name_singular" => $this->get_name_singular(),
             ]);
+            exit('HERE');
+
+            Session::set('create_old_data', null);
         }
 
         unset(Request::$request->php_admin_save);
-        echo ServicesResource::call(get_class($this), (array)Request::$request);
+        if($external_call == false) {
+            echo ServicesResource::call(get_class($this), (array)Request::$request);
+        } else {
+            if($external_call === 'redirect') {
+                return Presenter::present("generics.success_back", [
+                    // "success_info" => Translation::translate('success'),
+                    // "success_code" => 200,
+                    // "success_description"=>"<span>".$message."</span>",
+                ]);
+            }
+            return Presenter::present("generics.success", [
+                // "success_info" => Translation::translate('success'),
+                // "success_code" => 200,
+                // "success_description"=>"<span>".$message."</span>",
+            ]);
+        }
+
         Presenter::present("generics.success", []);
-
-        // ServicesResource::call(get_class($this), [], 'list');
-
-        // Presenter::present("generics.success", [
-        //     // "success_description"=>"<code>".$message."</code>",
-        // ]);
     }
 
-    protected function update(Array $data, $method = "PUT") {
+    // update
+    protected function update(Array $data, $external_call = false) {
+
+        $method = $this->endpoints_methods()->update;
+
+        $this->url = app('baseUrl').$this->endpoints["update"];
+
         $this->url = preg_replace('/{id}/', $this->action->uid, $this->url);
 
         $this->api->callWith($this->url, $method, $data);
 
+        $message = isset($this->api->response()->message) ? $this->api->response()->message : json_encode($this->api->response());
+
         if(isset($this->api->response()->success) && $this->api->response()->success == false) {
-            return Presenter::present("generics.error", [
-                "error_info" => "Failed",
+            $data[$this->uid] = $data['uid'];
+            return Presenter::present("generics.error_updating", [
+                "error_info" => Translation::translate('failure'),
                 "error_code" => 200,
-                "error_description"=>"<code>".json_encode($this->api->response())."</code>",
+                "error_description"=>"<span>$message</span>",
+                "php_admin_resource_class" => get_class($this),
+                "php_admin_resource_class_name_singular" => $this->get_name_singular(),
+                "data_edited" => $data
             ]);
         }
         
         $routeDetail = ServicesResource::routeDetail($_SERVER['HTTP_REFERER']);
 
         if($routeDetail->action != 'show') {
+
             unset(Request::$request->php_admin_update);
-            echo ServicesResource::call(get_class($this), (array)Request::$request);
-            return Presenter::present('generics.success');
+            if($external_call == false) {
+                echo ServicesResource::call(get_class($this), (array)Request::$request);
+                return Presenter::present("generics.success", [
+                    // "success_info" => Translation::translate('success'),
+                    // "success_code" => 200,
+                    // "success_description"=>"<span>".$message."</span>",
+                ]);
+            } 
+            else {
+                return Presenter::present("generics.success", [
+                    // "success_info" => Translation::translate('success'),
+                    // "success_code" => 200,
+                    // "success_description"=>"<span>".$message."</span>",
+                ]);
+            }
+
+        } 
+        else if($routeDetail->action == 'show') {
+            echo ServicesResource::call(get_class($this), (array)Request::$request, 'show');
+            return Presenter::present("generics.success", [
+                // "success_info" => Translation::translate('success'),
+                // "success_code" => 200,
+                // "success_description"=>"<span>".$message."</span>",
+            ]);
         }
 
-        return Presenter::present("generics.update_success", []);
+        // changed
+        return Presenter::present("generics.update_success", [
+            "success_info" => Translation::translate('success'),
+                "success_code" => 200,
+                "success_description"=>"<span>".$message."</span>",
+        ]);
 
     }
 
+    // read
     public function show() {
         $this->url = app('baseUrl').$this->endpoints["show"];
         return ShowGuesser::render($this, $this->action->uid);
     }
 
-    protected function delete(bool $verbose = false, $method = "DELETE") {
+    // delete
+    protected function delete(bool $verbose = false) {
+
+        $method = $this->endpoints_methods()->delete;
 
         if(!$this->deleteable) {
             return Presenter::present('generics.unauthorised');
@@ -409,11 +560,17 @@ abstract class BaseBlueprint extends Resource {
         $this->url = preg_replace('/{id}/', $this->action->uid, $this->url);
 
         $this->api->callWith($this->url, $method);
+        
+        $message = isset($this->api->response()->message) ? $this->api->response()->message : json_encode($this->api->response());
 
         if(!$verbose) {
             unset(Request::$request->php_admin_delete);
             echo ServicesResource::call(get_class($this), (array)Request::$request);
-            return Presenter::present('generics.success');
+            return Presenter::present('generics.success', [
+                // "success_info" => Translation::translate('success'),
+                // "success_code" => 200,
+                // "success_description"=>"<span>".$message."</span>",
+            ]);
         } else {
             return ;
         }
@@ -434,22 +591,36 @@ abstract class BaseBlueprint extends Resource {
             $this->api->get($url);
             $objects[] = $this->api->response();
         }
+        
+        if($this->api->response()->success == false) {
+            $objects = (array)$this->data_fetched;
+        }
 
         $csv = CsvExportGuesser::render($this, $objects);
 
-        echo "
-        <div class='ui icon message ". app('primaryColor') ."'>
-            <i class='download icon'></i>
-            <div class='content'>
-                <div class='header'>
-                File saved. Click the link bellow to download it before refreshing
+        if(isset($csv['file_link'])) {
+            echo "
+            <div class='ui icon message ". app('primaryColor') ."'>
+                <i class='download icon'></i>
+                <div class='content'>
+                    <div class='header'>
+                    File saved. Click the link bellow to download it before refreshing
+                    </div>
+                    <div class='divider'></div>
+                    <p class='footer ui label basic'>". $csv['file_link'] ."</p>
                 </div>
-                <div class='divider'></div>
-                <p class='footer ui label basic'>". $csv['file_link'] ."</p>
             </div>
-        </div>
-        ";
-        // var_dump($objects);
+            ";
+        } else {
+            echo "
+            <div class='ui icon message red'>
+                <div class='header'>
+                Error exporting data
+                </div>
+            </div>
+            ";
+        }
+
     }
 
     public function url() {
@@ -499,6 +670,32 @@ abstract class BaseBlueprint extends Resource {
     public function get_name_plurial() {
         return ucfirst($this->title['many'] ?? $this->model);
     }
+
+    public function local_paginate() {
+        return $this->local_paginate;
+    }
+
+    public function endpoints() {
+        return (object)$this->endpoints;
+    }
+    
+    public function endpoints_methods() {
+        return (object)$this->endpoints_methods;
+    }
+
+
+    // server paginate
+    public function paginate($key) {
+        if(isset($this->online_paginate[$key])) {
+            return $this->online_paginate[$key];
+        }
+        return null;
+    }
+
+    public function can_paginate() {
+        return isset($this->online_paginate['data_field']);
+    }
+
 }
 
 ?>

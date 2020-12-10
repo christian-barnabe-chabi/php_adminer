@@ -21,6 +21,8 @@
 
 <?php
 
+use Services\Translation;
+
 if(!isset($data)) $data = [];
 
     if(!key_exists('error_info', $data)) $data['error_info'] = "Failure" ;
@@ -37,7 +39,12 @@ if(!isset($data)) $data = [];
 
 <div class="ui modal compact mini error">
     <div class="header">
-         <?= 'Error '. $data['error_code'] .' - '. $data['error_info'] ?>
+        <?php
+            if(app('debug'))
+                echo Translation::translate('error') .' '. $data['error_code'] .' - ';
+        ?>
+            <?= $data['error_info'] ?>
+            
     </div>
     <div class="content">
         <?= $error_message ?>

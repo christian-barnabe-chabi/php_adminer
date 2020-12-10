@@ -6,6 +6,7 @@ use Abstracts\BaseBlueprint;
 use Services\API;
 use Services\Auth;
 use Services\DateFormater;
+use Services\Presenter;
 use Services\Request;
 use Services\Resource;
 use Services\Translation;
@@ -27,10 +28,19 @@ class ShowGuesser {
 
         $api = new API();
         $api->header("Authorization", app('authType').' '.Auth::token());
-        $response = $api->get($url)->response();
+        
+        $response = $api->callWith($url, $blueprint->endpoints_methods()->read)->response();
         
         if(is_array($response)) {
             exit("Multiple data send. Can't handle it");
+        }
+        
+        if(isset($response->success) && $response->success == false){
+            Presenter::present("generics.error", [
+                "error_info" => "API",
+                "error_code" => 404,
+                "error_description"=>Translation::translate('page_not_found'),
+            ]);
         }
 
         $primary_widget = "";
@@ -102,8 +112,6 @@ class ShowGuesser {
                             if($callback_return = self::callback($sub_key, $sub_value)) {
                                 $sub_key = Translation::translate($sub_key);
                                 $sub_key = ucfirst(str_replace('_',' ', $sub_key));
-                                $callback_return = preg_replace("/(http(s)?:\/\/.*)/i", "<a href='$1' target='_blank'>$1</a>", $callback_return);
-                                $callback_return = preg_replace("/(\w+((\.)?(\w)+)*@\w+(.\w{2,3}){1,})/i", "<a href='mailto:$1' target='_blank'>$1</a>", $callback_return);
                                     $sub_body .= "
                                     <td>
                                         $callback_return
@@ -172,7 +180,7 @@ class ShowGuesser {
 
                         $sub_body .= "<tr>";
                             $sub_body .= "<td class='collapsing'>$sub_key</td>";
-                            $sub_body .= self::build_cell($column, $callback_return);
+                            $sub_body .= self::build_cell($column, $callback_return, null, null, null, true);
                         $sub_body .= "</tr>";
                         continue;
                     }
@@ -196,10 +204,12 @@ class ShowGuesser {
                         continue;
                     }
 
-                    $value = preg_replace("/(http(s)?:\/\/.*)/i", "<a href='$1' target='_blank'>$1</a>", $value);
-                    $value = preg_replace("/(\w+((\.)?(\w)+)*@\w+(.\w{2,3}){1,})/i", "<a href='mailto:$1' target='_blank'>$1</a>", $value);
+                    // $value = preg_replace("/(http(s)?:\/\/.*)/i", "<a href='$1' target='_blank'>$1</a>", $value);
+                    // $value = preg_replace("/(\w+((\.)?(\w)+)*@\w+(.\w{2,3}){1,})/i", "<a href='mailto:$1' target='_blank'>$1</a>", $value);
+
                     $sub_body .= "<tr>";
-                        $sub_body .= "<td> {$value}</td>";
+                        // $sub_body .= "<td> {$value}</td>";
+                        $sub_body .= self::build_cell($column, $value, null, null, null);
                     $sub_body .= "</tr>";
                 }
 
@@ -220,7 +230,7 @@ class ShowGuesser {
 
                             $sub_body .= "<tr>";
                                 $sub_body .= "<td class='collapsing'>$sub_key</td>";
-                                $sub_body .= self::build_cell($column, $callback_return);
+                                $sub_body .= self::build_cell($column, $callback_return, null, null, null, true);
                             $sub_body .= "</tr>";
                             continue;
                         }
@@ -251,10 +261,11 @@ class ShowGuesser {
 
                         $sub_body .= "<tr>";
                             $sub_body .= "<td class='collapsing'>$sub_key</td>";
-                            $sub_value = preg_replace("/(http(s)?:\/\/.*)/i", "<a href='$1' target='_blank'>$1</a>", $sub_value);
-                            $sub_value = preg_replace("/(\w+((\.)?(\w)+)*@\w+(.\w{2,3}){1,})/i", "<a href='mailto:$1' target='_blank'>$1</a>", $sub_value);
-                            $sub_value = DateFormater::format(app('dateFormat'), $sub_value);
-                            $sub_body .= "<td>$sub_value</td>";
+                            // $sub_value = preg_replace("/(http(s)?:\/\/.*)/i", "<a href='$1' target='_blank'>$1</a>", $sub_value);
+                            // $sub_value = preg_replace("/(\w+((\.)?(\w)+)*@\w+(.\w{2,3}){1,})/i", "<a href='mailto:$1' target='_blank'>$1</a>", $sub_value);
+                            // $sub_value = DateFormater::format(app('dateFormat'), $sub_value);
+                            // $sub_body .= "<td>$sub_value</td>";
+                            $sub_body .= self::build_cell($column, $sub_value, null, null, null);
                         $sub_body .= "</tr>";
                     }
                 }
@@ -296,7 +307,7 @@ class ShowGuesser {
                 $_key = Translation::translate($key);
                 $primary_widget .= "<tr>";
                     $primary_widget .= "<td class='collapsing'>$_key</td>";
-                    $primary_widget .= self::build_cell($column, $callback_return);
+                    $primary_widget .= self::build_cell($column, $callback_return, null, null, null, true);
                 $primary_widget .= "</tr>";
                 continue;
             }
@@ -325,44 +336,46 @@ class ShowGuesser {
         // delete create button if needed
         $delete_element = "";
         $delete_modal_confirm = "";
-        if($blueprint->deleteable()) {
+        if($blueprint->deleteable($response)) {
             $delete_element = "
                 <span 
-                    onclick=\"
-                        $('#confirm_delete').modal({
-                            transition: 'fly',
-                        }).modal('show')\"
-                    
+                    id='on_show_page_delete_button'
                     class='ui button mini orange' >
                     <i class=' ui icon trash'></i>
                     ". Translation::translate("delete") ."
                 </span>
             ";
 
-            $delete_modal_confirm = "<div class='ui modal mini' id='confirm_delete'>";
-                $delete_modal_confirm .= "<div class='header'>";
-                    $delete_modal_confirm .= Translation::translate('are_you_sure_to_delete');
+            if($blueprint->deleteable($resource)){
+
+                $delete_modal_confirm = "<div class='ui modal mini' id='confirm_delete'>";
+                    $delete_modal_confirm .= "<div class='header'>";
+                        $delete_modal_confirm .= Translation::translate('are_you_sure_to_delete');
+                    $delete_modal_confirm .= "</div>";
+        
+                    $delete_modal_confirm .= "<form method='POST' class='actions' action='/{$resource}'>";
+                        $delete_modal_confirm .= "<input name='php_admin_action' type='hidden' value='delete'>";
+                        $delete_modal_confirm .= "<input name='php_admin_uid' type='hidden' value='$uid'>";
+                        $delete_modal_confirm .= "<button data-url=\"".app('baseUrl').$blueprint->endpoints()->delete."\" data-method='{$blueprint->endpoints_methods()->delete}' data-value=\"$uid\" type='button' class='ui button small orange modal_delete_button_show_page'>". Translation::translate('delete') ."</button>";
+                        $delete_modal_confirm .= "<button type='button' class='ui button small olive deny'>". Translation::translate('cancel') ."</button>";
+                    $delete_modal_confirm .= "</form>";
                 $delete_modal_confirm .= "</div>";
-    
-                $delete_modal_confirm .= "<form method='POST' class='actions' action='/{$resource}'>";
-                    $delete_modal_confirm .= "<input name='php_admin_action' type='hidden' value='delete'>";
-                    $delete_modal_confirm .= "<input name='php_admin_uid' type='hidden' value='$uid'>";
-                    $delete_modal_confirm .= "<button type='submit' class='ui button small orange'>". Translation::translate('delete') ."</button>";
-                    $delete_modal_confirm .= "<button type='button' class='ui button small olive deny'>". Translation::translate('cancel') ."</button>";
-                $delete_modal_confirm .= "</form>";
-            $delete_modal_confirm .= "</div>";
+
+            }
+
         }
 
 
         // edit create button if needed
         $edit_element = "";
         $update_modal_forms = "";
-        if($blueprint->editable()) {
+        if($blueprint->editable($response)) {
             $modal_data_id = substr(md5($uid), 0, 10);
             $edit_element = "
                 <span onclick=\"
                     $('#$modal_data_id').modal({
                         transition: 'drop',
+                        closable: false
                     }).modal('show')\"
                 href='/{$resource}/edit/{$uid}' class='ui button mini blue' >
                     <i class=' ui icon pencil'></i>
@@ -372,15 +385,23 @@ class ShowGuesser {
 
             // edit form for update
             $class = get_class(self::$blueprint);
-            $update_modal_forms = "<div class='ui large modal' id='$modal_data_id'>";
-                $update_modal_forms .= "<div class='header'>";
-                    $update_modal_forms .= $blueprint->get_name_singular() ." > ". Translation::translate('update');
+
+            if($blueprint->editable($response)) {
+
+                $update_modal_forms = "<div class='ui large modal' id='$modal_data_id'>";
+                    $update_modal_forms .= "<i class='ui icon close'></i>";
+                    $update_modal_forms .= "<div class='header'>";
+                        $update_modal_forms .= "<i class='ui folder open outline icon'></i> | " . $blueprint->get_name_singular() ." | ". Translation::translate('update');
+                    $update_modal_forms .= "</div>";
+    
+                    $update_modal_forms .= "<div class='content scrolling'>";
+                        $update_modal_forms .= $blueprint->edit($response);;
+                        // $update_modal_forms .= Resource::call($class, (Array)$response, 'edit');
+                    $update_modal_forms .= "</div>";
                 $update_modal_forms .= "</div>";
 
-                $update_modal_forms .= "<div class='content scrolling'>";
-                    $update_modal_forms .= Resource::call($class, (Array)$response, 'edit');
-                $update_modal_forms .= "</div>";
-            $update_modal_forms .= "</div>";
+            }
+
         }
 
         // export create button if needed
@@ -497,9 +518,27 @@ class ShowGuesser {
         return null;
     }
 
-    private static function build_cell(ColumnAttribute $column, $cell_value, $cell_link = null, $tooltip = null, $labeled = null) {
+    private static function build_cell(ColumnAttribute $column, $cell_value, $cell_link = null, $tooltip = null, $labeled = null, $callbacked = false) {
         $elements = "";
+
+        $re1 = '%(?:(?:https?|ftp)://)(?:\S+(?::\S*)?@|\d{1,3}(?:\.\d{1,3}){3}|(?:(?:[a-z\d\x{00a1}-\x{ffff}]+-?)*[a-z\d\x{00a1}-\x{ffff}]+)(?:\.(?:[a-z\d\x{00a1}-\x{ffff}]+-?)*[a-z\d\x{00a1}-\x{ffff}]+)*(?:\.[a-z\x{00a1}-\x{ffff}]{2,6}))(?::\d+)?(?:[^\s]*)?%iu';
+        // $re1 = '%^(?:(?:https?|ftp)://)(?:\S+(?::\S*)?@|\d{1,3}(?:\.\d{1,3}){3}|(?:(?:[a-z\d\x{00a1}-\x{ffff}]+-?)*[a-z\d\x{00a1}-\x{ffff}]+)(?:\.(?:[a-z\d\x{00a1}-\x{ffff}]+-?)*[a-z\d\x{00a1}-\x{ffff}]+)*(?:\.[a-z\x{00a1}-\x{ffff}]{2,6}))(?::\d+)?(?:[^\s]*)?$%iu';
+        $re2 = '/(\w+((\.|-|_)?(\w)+)*@(\w+|-|_|\.)+\.\w{2,5})/i';
+
+        if($callbacked) {
+            $cell_link = preg_match($re1, $cell_value) ? '' : $cell_link;
+            $elements .=
+            "<td {$cell_link} class=''>
+                <span {$tooltip} {$labeled}>".
+                    $cell_value
+                ."</span>
+            </td>";
+
+            return $elements;
+        }
+
         if(preg_match('/\w*\.(jpeg|png|bmp|gif|jpg|ico|tiff)/', $cell_value)) {
+            
             $form = '';       
             if(isset($column->image)) {
                 $form = $column->image;
@@ -508,7 +547,7 @@ class ShowGuesser {
             $form = in_array($form, ['rounded', 'circular']) ? $form : 'rounded';
             $elements .=
             "<td class='' uk-lightbox>
-                <a href='$cell_value'>
+                <a class='external-link' href='$cell_value'>
                 <img {$tooltip} src='$cell_value' class='ui $form image avata tiny' style='height: 60px; width: auto' alt=''>
                 </a>
             </td>";
@@ -519,11 +558,21 @@ class ShowGuesser {
 
         $cell_value = DateFormater::format(app('dateFormat'), $cell_value);
 
-        $re1 = '/(http(s)?:\/\/)(www.)?((\w|-|_)+\.\w{2,5}(\/(\w|\?|\=|-|_)*)*)/i';
-        $re2 = '/(\w+((\.|-|_)?(\w)+)*@(\w+|-|_|\.)+\.\w{2,5})/i';
-        if(preg_match($re1, $cell_value) || preg_match($re2, $cell_value)) {
-            $cell_value = preg_replace($re1, "<a href='$0' target='_blank'>$0</a>", $cell_value);
-            $cell_value = preg_replace($re2, "<a href='mailto:$0' target='_blank'>$0</a>", $cell_value);
+
+        if(preg_match($re1, $cell_value, $matches)) {
+            $cell_value = "<a class='external-link' href='{$matches[0]}' target='_blank' data-tooltip='$matches[0]'>". Translation::translate('internet_link') ." <i class='external alternate icon'></i></a>";
+            $cell_link = '';
+
+            $elements .=
+            "<td {$cell_link} class=''>
+                <span {$tooltip} {$labeled}>".
+                    $cell_value
+                ."</span>
+            </td>";
+
+            return $elements;
+        } else if(preg_match($re2, $cell_value, $matches)) {
+            $cell_value = "<a class='external-link' href='mailto:{$matches[0]}' data-tooltip='$matches[0]' target='_blank'><i class='ui icon mail'></i>". Translation::translate('email_link') ."</a>";
             $cell_link = '';
 
             $elements .=

@@ -25,6 +25,11 @@ class ColumnAttribute {
     public $length;
     public $id;
     public $class;
+    public $columns;
+    public $detail;
+    public $accept;
+    public $searchable;
+    public $label;
 
     public function __construct($column = null, $value = null)
     {
@@ -49,8 +54,13 @@ class ColumnAttribute {
         $this->option_image = isset($column->option_image) ? $column->option_image : null;
         $this->callback = isset($column->callback) ? $column->callback: null;
         $this->length = isset($column->length) ? $column->length: 128;
-        $this->id = isset($column->id) ? $column->id: '';
+        // $this->id = isset($column->id) ? $column->id: null;
         $this->class = isset($column->class) ? $column->class: '';
+        $this->columns = isset($column->columns) ? $column->columns: null;
+        $this->detail = isset($column->detail) ? '('.$column->detail.')' : '';
+        $this->accept = isset($column->accept) ? 'accept="'.$column->accept.'"' : '';
+        $this->searchable = $column->searchable ?? true;
+	$this->label = isset($column->label) ? $column->label : '';
     }
 
 }

@@ -21,14 +21,21 @@
 
 <?php
 
+use Services\Resource;
 use Services\Router;
 use Services\Translation;
 
-if(!isset($data)) $data = [];
+    echo "<div class='ui container fluid'>
 
-    if(!key_exists('error_info', $data)) $data['error_info'] = Translation::translate('denied') ;
-    if(!key_exists('error_code', $data)) $data['error_code'] = "401";
-    if(!key_exists('error_description', $data)) $data['error_description'] = Translation::translate('permission_error');
+    
+    <div class='uk-position-relative uk-padding-small' id='main-container'>";
+    
+    
+    if(!isset($data)) $data = [];
+    
+    if(!key_exists('error_info', $data)) $data['error_info'] = Translation::translate('failure');
+    if(!key_exists('error_code', $data)) $data['error_code'] = 100;
+    if(!key_exists('error_description', $data)) $data['error_description'] = Translation::translate('error');
 
     try {
         $error_description = json_decode($data['error_description']);
@@ -47,10 +54,23 @@ if(!isset($data)) $data = [];
             <?= $data['error_info'] ?>
     </div>
     <div class="content">
+        <?= app('debug') && isset($data['url']) ? '<code>'.$data['url'].'</code><br>' : '' ?>
         <?= $error_message ?>
     </div>
     <div class="actions">
-        <button onclick="$('.ui.error.modal').modal('hide'); window.location.href ='<?= Router::backLink() ?>'" class="ui mini orange button"> <?= Translation::translate('back') ?> </button>
+        <button onclick="$('.ui.error.modal').modal('hide'); window.location.href ='<?= Router::backLink() ?>'" class="ui mini red button"> <?= Translation::translate('back') ?> </button>
+        <button onclick="$('#create_form').modal({closable:false}).modal('show')" class="ui mini blue button"> <?= Translation::translate('correct_data') ?> </button>
+    </div>
+</div>
+
+<div class='ui large modal' id='create_form'>
+    <i class="ui close icon" onclick="window.location.href ='<?= Router::backLink() ?>'"></i>
+    <div class='header'>
+        <i class='ui folder open outline icon'></i> | <?= $data['php_admin_resource_class_name_singular'] ?> | <?= Translation::translate('create') ?> 
+    </div>
+
+    <div class='content scrolling'>
+        <?= Resource::call($data['php_admin_resource_class'], [], 'create') ?>
     </div>
 </div>
 
@@ -61,5 +81,7 @@ if(!isset($data)) $data = [];
         transition: 'horizontal flip',
     }).modal('show');
 </script>
+
+
 
 <?php  exit(); ?>

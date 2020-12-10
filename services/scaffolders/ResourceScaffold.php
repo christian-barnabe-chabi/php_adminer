@@ -3,6 +3,7 @@
 namespace Services\Scaffolders;
 
 use Services\Request;
+use Services\Resource;
 
 class ResourceScaffold {
     private static $elements = "";
@@ -15,9 +16,11 @@ class ResourceScaffold {
         $class = $active ? ' active ' : '';
         $secondaryColor = app('secondaryColor', 'rgba(0, 172, 29, 0.979)');
 
+        $href = Resource::link("/$href");
+
         if($active)
             self::$elements .= "
-            <a class='{$class} item' style='background-color: $secondaryColor !important' href='/$href'>
+            <a class='{$class} item selected_resource_leftside_menu' href='$href'>
                 <span>
                     <i class='ui {$icon} icon'></i>
                     {$name}
@@ -25,7 +28,7 @@ class ResourceScaffold {
             </a>";
         else
             self::$elements .= "
-            <a class='{$class} item' href='/$href'>
+            <a class='{$class} item resource_leftside_menu' href='$href'>
                 <span>
                     <i class='ui {$icon} icon'></i>
                     {$name}
@@ -36,7 +39,7 @@ class ResourceScaffold {
     public static function render() {
         $primary_color = app('primaryColor');
         $inverted = app('colorful') ? 'inverted segment' : '';
-        $bg_white = empty($inverted)  ? 'background: white' : '';
+        $bg_white = empty($inverted)  ? 'background: white; color: grey !important' : '';
         echo"
             <div class='ui secondary segment {$primary_color} {$inverted} vertical menu fixed' id='side-menu' style='overflow: auto; {$bg_white}; padding: 5px 5px; box-shadow: 3px 0px 3px rgba(0, 0, 0, 0.2)'>".
 

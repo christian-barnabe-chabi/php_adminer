@@ -60,6 +60,10 @@ class Request {
         $req = array_merge($req, get_request_files());
         self::$request = (Object)$req;
 
+        // var_dump($req);
+
+        // exit();
+
         foreach (self::$request as $key => $value) {
             $this->$key = $value;
         }

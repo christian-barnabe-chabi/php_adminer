@@ -5,8 +5,7 @@ namespace Config;
 class PublicResource {
 
     private static $routes = [
-        '/password_reset', '/logout','/login', '/untracked_ticket/save', '/sme/save',
-        '/mode?theme=night', '/mode?theme=light'
+        '/password_reset', '/logout','/login', '/untracked_ticket', '/sme'
     ];
 
     public static function routes() {
@@ -17,7 +16,9 @@ class PublicResource {
 
         // return in_array($route, self::routes());
         
-        return preg_match("#$route.*#", $route);
+        // return preg_match("#$route.*#", $route);
+
+        return [];
     }
 
 }

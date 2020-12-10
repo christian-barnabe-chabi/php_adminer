@@ -13,9 +13,15 @@ class Resource
     private static $page_title;
     private static $generated_code;
     private static $handle_methode_name = "handle";
+    private static $endpoints = null;
 
     public static function load(string $resource_class, array $data = [], $handle_methode_name = 'handle')
     {
+        // if(is_link($_SERVER['DOCUMENT_ROOT'].'/server/public') == false){
+        //     symlink($_SERVER['DOCUMENT_ROOT'].'/public', $_SERVER['DOCUMENT_ROOT'].'/server/public');
+        // }
+
+
         $data = array_merge((Array)Request::$request, $data);
 
         self::$resource = new $resource_class($data);
@@ -24,6 +30,10 @@ class Resource
             self::$page_title = self::$resource->get_model_name() .' | ';
         } else {
             self::$page_title = Request::$request->php_admin_resource ? Translation::translate(Request::$request->php_admin_resource).' | ' : ' ';
+        }
+
+        if(method_exists(self::$resource, 'get_endpoints')) {
+            self::$endpoints = self::$resource->get_endpoints();
         }
 
         self::$page_title = str_replace('_', ' ', self::$page_title);
@@ -51,32 +61,52 @@ class Resource
 
         $title = ucfirst(strtolower(self::$page_title)) . strtoupper(app('appName'));
         $favicon = app('icon');
+        $robot = app('robots', 'noindex');
+        $secondaryColor = app('secondaryColor', 'rgba(0, 172, 29, 0.979)');
         echo "
         <!DOCTYPE html>
         <html lang='en'>
         <head>
             <meta charset='UTF-8'>
             <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+            <meta name='robots' content='$robot'>
             <link rel='shortcut icon' href='{$favicon}'>
             <title>{$title}</title>
-            <script src='/assets/js/jquery.js'></script>
-            <link rel='stylesheet' href='/assets/SemanticUI/semantic.min.css'>
-            <script src='/assets/SemanticUI/semantic.min.js'></script>
-            <script src='/assets/js/modes.js'></script>
-            <script src='/assets/SemanticUI/tablesort.js'></script>
-            <link rel='stylesheet' href='/assets/uikit/css/uikit.min.css'>
-            <link rel='stylesheet' href='/assets/uikit/css/uikit-rtl.min.css'>
-            <script defer src='/assets/uikit/js/uikit-icons.min.js'></script>
-            <script defer src='/assets/uikit/js/uikit.min.js'></script>
-            <link rel='stylesheet' href='/assets/css/main.css'>
-            <script src='/assets/js/chart.js'></script>
-            <script src='/assets/js/main.js'></script>
-            <script src='/assets/js/paginator.js' defer></script>
-            <script src='/assets/js/table_search.js' defer></script>
-            <script src='/assets/js/example.js' defer></script>
+            <link rel='stylesheet' href='/public/SemanticUI/semantic.min.css'>
+            <link rel='stylesheet' href='/public/uikit/css/uikit.min.css'>
+            <link rel='stylesheet' href='/public/uikit/css/uikit-rtl.min.css'>
+            <link rel='stylesheet' href='/public/css/main.css'>
+
+            <script src='/public/js/jquery.js'></script>
+            <script src='/public/SemanticUI/semantic.min.js'></script>
+            <script src='/public/js/modes.js'></script>
+            <script src='/public/SemanticUI/tablesort.js'></script>
+            <script defer src='/public/uikit/js/uikit-icons.min.js'></script>
+            <script defer src='/public/uikit/js/uikit.min.js'></script>
+            <script src='/public/js/chart.js'></script>
+            <script src='/public/js/php_admin_script.js' defer></script>
+            <script src='/public/js/main.js'></script>
+            <script src='/public/js/example.js' defer></script>
+            <script src='/public/js/resourceFunctions.js'></script>
+            <script src='/public/js/paginator.js' defer></script>
+            <script src='/public/js/table_search.js' defer></script>
+
+            <style>
+                .item.selected_resource_leftside_menu {
+                    background-color: $secondaryColor !important
+                }
+            </style>
         </head>
         <body class='uk-margin-remove uk-padding-remove'>
         ";
+
+        if(method_exists(self::$resource, 'local_paginate') && self::$resource->local_paginate()) {
+            echo "<input type='hidden' id='page_paginator_indicator' value='1'>";
+        } else {
+            echo "<input type='hidden' id='page_paginator_indicator' value='0'>";
+        }
+
+        echo "<input type='hidden' id='authToken' value='". Auth::token() ."'>";
 
         if(file_exists($_SERVER['DOCUMENT_ROOT'].'/views/header.php')) {
             Presenter::present('header');
@@ -90,6 +120,8 @@ class Resource
                 <!--div class='uk-text-center'>
                     <span uk-spinner='ratio: 9' id='spinner'></span>
                 </div-->
+
+                <div class='ui active loader text waiting' style='display: none;'>". Translation::translate('loading') ."</div>
     
                 <div class='uk-position-relative uk-padding-small' id='main-container'>
         ";
@@ -102,6 +134,7 @@ class Resource
                     </div>
                 </div>
             </body>
+
         </html>
         ";
 
@@ -112,7 +145,11 @@ class Resource
     }
 
     public static function link($resource) {
-        return "/$resource";
+        $host = app('appUrl', $_SERVER["HTTP_HOST"]);
+        $link = str_replace("//", "/", "$host/$resource");
+        $requestProtocol = strtolower(explode('/', $_SERVER['SERVER_PROTOCOL'])[0]);
+        $link = $requestProtocol."://".$link;
+        return $link;
     }
 
     public static function show(string $resource, array $data = [], $handle_methode_name = "handle")

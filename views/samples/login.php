@@ -4,7 +4,7 @@ use Services\Resource;
 use Services\Translation;
 
 ?>
-        
+
 <div class="ui container">
     
     <div class="ui two column stackable grid centered" id="login_form_container" style="top: 8%">
@@ -38,7 +38,7 @@ use Services\Translation;
                     </div>
                     <div class="field uk-text-right">
                         <!-- <a href="<?= Resource::link('password_reset') ?>" class='uk-link-muted uk-link-reset ui label orange'> <?= Translation::translate('password_forgot') ?> </a> -->
-                        <a target="_blank" href="http://45.79.221.17:8000/password/reset" class='uk-link-muted uk-link-reset ui label grey'> <?= Translation::translate('password_forgot') ?> </a>
+                        <a target="_blank" href="#/password/reset" class='uk-link-muted uk-link-reset ui label grey'> <?= Translation::translate('password_forgot') ?> </a>
                     </div>
                 </div>
             </form>
